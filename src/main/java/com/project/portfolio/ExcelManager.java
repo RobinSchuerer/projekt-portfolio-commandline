@@ -1,29 +1,10 @@
 package com.project.portfolio;
 
-import static com.project.portfolio.utility.PortfolioConstants.DEADLINE;
-import static com.project.portfolio.utility.PortfolioConstants.MHP;
-import static com.project.portfolio.utility.PortfolioConstants.MUST_HAVE;
-import static com.project.portfolio.utility.PortfolioConstants.PP;
-import static com.project.portfolio.utility.PortfolioConstants.PRODUCT;
-import static com.project.portfolio.utility.PortfolioConstants.SP;
-import static com.project.portfolio.utility.PortfolioConstants.STRATEGIC;
-
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.math.BigDecimal;
-import java.math.MathContext;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
+import com.project.portfolio.domain.*;
+import com.project.portfolio.exceptions.WrongFileFormatException;
+import com.project.portfolio.utility.ProjectColor;
+import com.project.portfolio.utility.TeamColor;
+import de.lv1871.projektportfolio.domain.ProjektPortfolio;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFRow;
@@ -31,195 +12,46 @@ import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.joda.time.LocalDate;
 
-import com.project.portfolio.domain.Project;
-import com.project.portfolio.domain.ProjectPortfolio;
-import com.project.portfolio.domain.ProjectTeamWork;
-import com.project.portfolio.domain.ProjectType;
-import com.project.portfolio.domain.Restriction;
-import com.project.portfolio.domain.Team;
-import com.project.portfolio.domain.TeamBucket;
-import com.project.portfolio.domain.TeamCapacity;
-import com.project.portfolio.domain.TeamEffort;
-import com.project.portfolio.exceptions.WrongFileFormatException;
-import com.project.portfolio.utility.ProjectColor;
-import com.project.portfolio.utility.TeamColor;
+import java.io.BufferedInputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.math.BigDecimal;
+import java.math.MathContext;
+import java.util.*;
 
-
+import static com.project.portfolio.utility.PortfolioConstants.*;
 
 public class ExcelManager {
-	
-//	public ProjectPortfolio readPortfolio(XSSFWorkbook workbook) throws Exception {
-//		boolean isInputRead = false;
-//		ProjectPortfolio portfolio = new ProjectPortfolio();
-//		Set<Restriction> restrictions = portfolio.getRestrictions();  
-//		SortedSet<Team> teams = portfolio.getTeams();
-//		SortedSet<Project> projects = portfolio.getProjects();
-//		Team team = null;
-//		TeamCapacity teamCapacity = null;
-//		LocalDate executionMonth= null;
-//		Row row = null;
-//		String[] colors = null;
-//		XSSFSheet sheet = workbook.getSheetAt(0);
-//		 
-//		//Get iterator to all the rows in current sheet
-//		Iterator<Row> rowIterator = sheet.iterator();
-//		
-//		while (rowIterator.hasNext()) {
-//			 
-//			if(isInputRead) {
-//				break;	
-//			}
-//		row = rowIterator.next();	
-//			
-//			//Get iterator to all cells of current row
-//			Iterator<Cell> cellIterator = row.cellIterator();
-//			while (cellIterator.hasNext()) {
-//				Cell cell = cellIterator.next();
-//				
-//					String cellValue = cell.getStringCellValue();
-//					if(cellValue != null && cellValue.equalsIgnoreCase(PORTFOLIO)) {
-//						portfolio.setName(cellIterator.next().getStringCellValue());
-//						break;
-//					}
-//					if(cellValue != null && cellValue.startsWith(RESTRICTION)) {
-//						if(cellValue.endsWith(MUST_HAVE)) {
-//							Restriction restriction  = new Restriction();
-//							restriction.setProjectType(new ProjectType(MHP));
-//							restriction.setTeamCapacityAllocation((Double)(cellIterator.next().getNumericCellValue() * 100));
-//							restrictions.add(restriction);	
-//							break;
-//						}
-//						if(cellValue.endsWith(PRODUCT)) {
-//							Restriction restriction  = new Restriction();
-//							restriction.setProjectType(new ProjectType(PP));
-//							restriction.setTeamCapacityAllocation((Double)(cellIterator.next().getNumericCellValue() * 100));
-//							restrictions.add(restriction);
-//							break;
-//						}
-//					}
-//					
-//					
-//					if(cellValue != null && cellValue.equalsIgnoreCase(EARLIEST_EXEC_MONTH)) {
-//						Date month = cellIterator.next().getDateCellValue();
-//						executionMonth = new LocalDate(month);
-//					}
-//					if(cellValue != null && cellValue.equalsIgnoreCase(TEAMS)) {
-//						for (int i=0; i< row.getPhysicalNumberOfCells()-1; i++) {
-//							team = new Team();
-//							team.setOrder(i);
-//							team.setName(cellIterator.next().getStringCellValue());
-//							team.setColor(TeamColor.getTeamColor(i));
-//							teams.add(team);
-//						}
-//						if(teams.size() == 0) {
-//							throw new WrongFileFormatException("Wrong Excel File Format...");
-//						}
-//						break;
-//					}
-//					
-//					if(cellValue != null && cellValue.equalsIgnoreCase(MONTH)) {
-//							for(int i=0; i<24; i++) {
-//								row = rowIterator.next();
-//								Iterator<Cell> capacityCellsIterator = row.cellIterator();
-//								int capaticityTeams = row.getPhysicalNumberOfCells()-1; 
-//								while (capacityCellsIterator.hasNext()) {
-//									Date month =  capacityCellsIterator.next().getDateCellValue();
-//									Iterator<Team> teamIterator = teams.iterator();
-//									while (teamIterator.hasNext()) {
-//										for(int j=0; j < capaticityTeams; j++) {
-//											teamCapacity = new TeamCapacity();
-//											LocalDate currentMonth = new LocalDate(month);
-//											if(executionMonth == null) {
-//												executionMonth = new LocalDate(currentMonth);
-//											}
-//											teamCapacity.setMonth(currentMonth);
-//											teamCapacity.setManDays((int)capacityCellsIterator.next().getNumericCellValue());
-//											Team t = teamIterator.next();
-//											t.getTeamCapacities().add(teamCapacity);
-//											TeamBucket tBucket = new TeamBucket();
-//											tBucket.setBucketMonth(new LocalDate(month));
-//											tBucket.setTeamCapacity(teamCapacity);
-//											t.addTeamBucket(tBucket);
-//											tBucket.setTeamName(t.getName());
-//											
-//										}
-//									}
-//									
-//								}
-//							}
-//					}
-//					if(cellValue != null && cellValue.equalsIgnoreCase(PROJECTS)) {
-//						int projectsCount = row.getPhysicalNumberOfCells()-1;
-//						for(int j=0; j < projectsCount; j++) {
-//							Project p = new Project();
-//							p.setOrder(j);
-//							p.setColor(ProjectColor.getProjectColor(j));
-//							p.setExecutionMonth(executionMonth);
-//							p.setName(cellIterator.next().getStringCellValue());
-//							portfolio.addProject(p);
-//						}
-//						break;
-//					}
-//					if(cellValue != null && cellValue.equalsIgnoreCase(TYPE)) {
-//						Iterator<Project> projectIterator = projects.iterator();
-//						int index = 0;
-//						while (projectIterator.hasNext()) {
-//							Project p = projectIterator.next();
-//							if(colors == null) {
-//								colors = new String[projects.size()];
-//							}
-////							p.setColor(ProjectColor.getProjectColor(index));
-//							String pType =  cellIterator.next().getStringCellValue();
-//							p.setProjectType(new ProjectType(getProjectTypeCode(pType), pType));
-//							index++;
-//						}
-//						break;
-//					}
-//					
-//					if(cellValue != null && cellValue.equalsIgnoreCase(PRIORITY)) {
-//						Iterator<Project> projectIterator = projects.iterator();
-//						while (projectIterator.hasNext()) {
-//							projectIterator.next().setPriority((int)cellIterator.next().getNumericCellValue());
-//						}
-//						break;
-//					}
-//					
-//					if(cellValue != null && cellValue.startsWith(DEADLINE)) {
-//						Iterator<Project> projectIterator = projects.iterator();
-//						while (projectIterator.hasNext()) {
-//							Cell dateCell = cellIterator.next();
-//							if(dateCell.getCellType() == 0) {
-//								projectIterator.next().setDeadlineMonth(new LocalDate(dateCell.getDateCellValue()));	
-//							} else {
-//								projectIterator.next().setDeadlineMonth(null);
-//							}
-//							
-//						} 
-//						break;
-//					}
-//					
-//					if(cellValue != null && cellValue.startsWith(EFFORT)) {
-//						if(teams.size() == 0) {
-//							throw new WrongFileFormatException("Wrong Excel File Format...");
-//						}
-//						setUpProjectTeamEffort(projects,teams, cellIterator);
-//						for (int i=0; i< teams.size()-1; i++) {
-//							row = rowIterator.next();
-//							Iterator<Cell> effotCellIterator = row.cellIterator();  
-//							setUpProjectTeamEffort(projects, teams, effotCellIterator);
-//						}
-//						isInputRead = true;
-//						break;
-//					}
-//				} // cell iterator
-//			} // row iterator
-//		
-//		System.out.println("portfolio : "+portfolio.toString());
-//		return portfolio;
-//		}
-	
-	
-	public ProjectPortfolio readPortfolio(XSSFWorkbook workbook) throws Exception {
+
+    public ProjektPortfolio read(XSSFWorkbook workbook) throws Exception {
+        XSSFSheet sheet = workbook.getSheetAt(0);
+
+        String portfolioName = getPortfolioName(sheet);
+
+        return ProjektPortfolio.newBuilder().withName(portfolioName).build();
+
+    }
+
+    private String getPortfolioName(XSSFSheet sheet) {
+        Iterator<Row> rowIterator = sheet.rowIterator();
+        while(rowIterator.hasNext()){
+            Row zeile = rowIterator.next();
+            // erste Zelle der Zeile soll Portfolio sein
+            Cell ersteZelle = zeile.getCell(0);
+            if(ersteZelle.getCellType() == Cell.CELL_TYPE_STRING && "portfolio".equals(ersteZelle.getStringCellValue())){
+                return zeile.getCell(2).getStringCellValue();
+            }
+        }
+
+        throw new AssertionError("Portfolio Name konnte nicht gefunden werden");
+    }
+
+
+    public ProjectPortfolio readPortfolio(XSSFWorkbook workbook) throws Exception {
+
+
+
 		boolean isInputRead = false;
 		ProjectPortfolio portfolio = new ProjectPortfolio();
 		Set<Restriction> restrictions = portfolio.getRestrictions();  
@@ -293,21 +125,20 @@ public class ExcelManager {
 						for(int i=0; i<24; i++) {
 							row = rowIterator.next();
 							Iterator<Cell> capacityCellsIterator = row.cellIterator();
-							int capaticityTeams = row.getPhysicalNumberOfCells()-1; 
-							while (capacityCellsIterator.hasNext()) {
 								Date month =  capacityCellsIterator.next().getDateCellValue();
 								monthsForEstimation[i] = new LocalDate(month);
 								Iterator<Team> teamIterator = teams.iterator();
 								while (teamIterator.hasNext()) {
-									for(int j=0; j < capaticityTeams; j++) {
+									Team t = teamIterator.next();
+                                    System.out.println(t.getName());
 										teamCapacity = new TeamCapacity();
 										LocalDate currentMonth = new LocalDate(month);
 										if(executionMonth == null) {
 											executionMonth = new LocalDate(currentMonth);
 										}
 										teamCapacity.setMonth(currentMonth);
-										teamCapacity.setManDays(BigDecimal.valueOf(capacityCellsIterator.next().getNumericCellValue()));
-										Team t = teamIterator.next();
+                                    teamCapacity.setManDays(BigDecimal.valueOf(capacityCellsIterator.next().getNumericCellValue()));
+
 										t.getTeamCapacities().add(teamCapacity);
 										TeamBucket tBucket = new TeamBucket();
 										tBucket.setBucketMonth(new LocalDate(month));
@@ -315,9 +146,6 @@ public class ExcelManager {
 										t.addTeamBucket(tBucket);
 										tBucket.setTeamName(t.getName());
 										
-									}
-								}
-								
 							}
 						}
 						break;
@@ -343,7 +171,6 @@ public class ExcelManager {
 							if(colors == null) {
 								colors = new String[projects.size()];
 							}
-//							p.setColor(ProjectColor.getProjectColor(index));
 							String pType =  cellIterator.next().getStringCellValue();
 							p.setProjectType(new ProjectType(getProjectTypeCode(pType), pType));
 							index++;
@@ -391,10 +218,9 @@ public class ExcelManager {
 			                System.out.println("Invalid Value.");
 			                break;
 					}
-				} // cell iterator
-			} // row iterator
+				}
+			}
 		
-		System.out.println("portfolio : "+portfolio.toString());
 		return portfolio;
 	}
 	public String getProjectCode(String name){
@@ -432,138 +258,7 @@ public class ExcelManager {
 		}
 	}
 	
-//	public ProjectPortfolio processProjectPortfolio(XSSFWorkbook workbook) throws Exception {
-//		ProjectPortfolio projectPortfolio = readPortfolio(workbook);
-//		SortedSet<Project> projects = projectPortfolio.getProjects();
-//		Set<Team> teams = projectPortfolio.getTeams();
-//		Set<Restriction> restrictions = projectPortfolio.getRestrictions();
-//		Restriction mhpRestriction = getMHPRestriction(restrictions);
-//		Restriction ppRestriction = getPPRestriction(restrictions);
-//		Map<String,SortedSet<Project>> projectTypes = getProjectsTypes(projects);
-//		SortedSet<Project> mhProjects = projectTypes.get(MHP);
-//		SortedSet<Project> pProjects  = projectTypes.get(PP);
-//		SortedSet<Project> sProjects  = projectTypes.get(SP);
-//		
-//		// start with Must-Have & Product projects...
-//		
-//		SortedSet<Project> mhANDpProjects = new TreeSet<Project>();
-//		mhANDpProjects.addAll(mhProjects);
-//		mhANDpProjects.addAll(pProjects);
-//		
-//		if(mhANDpProjects != null && mhANDpProjects.size() != 0) {
-//			Iterator<Team> teamIterator = teams.iterator();
-//			while (teamIterator.hasNext()) {
-//				BigDecimal accumulatedTeamWork = new BigDecimal(0.0) ;
-//				SortedSet<Project> teamEngagedProjects = new TreeSet<Project>();
-//				Team team = teamIterator.next();
-//				SortedSet<TeamCapacity> teamCapacities = team.getTeamCapacities();
-//				SortedSet<TeamBucket> teamBuckets = team.getTeamBuckets();
-//				
-//				// Get the latest deadline month.
-//				LocalDate latestDeadline = getLatestDeadline(mhANDpProjects);
-//				
-//				// Iterate over all the team capacities starting from the latest deadline month to starting month..
-//				
-//				TeamCapacity tailTCapacity = getTeamMonthCapacity(teamCapacities, latestDeadline);
-//				SortedSet<TeamCapacity> tcSortedSet = teamCapacities.headSet(tailTCapacity);
-//				SortedSet<TeamCapacity> engagedTeamCapacitySet = new TreeSet<TeamCapacity>();
-//				engagedTeamCapacitySet.addAll(tcSortedSet);
-//				engagedTeamCapacitySet.add(tailTCapacity);
-//				TeamCapacity[] engagedTCapacities = new TeamCapacity[engagedTeamCapacitySet.size()];
-//				engagedTCapacities = engagedTeamCapacitySet.toArray(engagedTCapacities);
-//				for(int i=engagedTCapacities.length-1; i>=0 ; i--) {
-//					// Get the projects on that month (may be deadline)...
-//					
-//					SortedSet<Project> monthProjects = getMonthlyProjects(engagedTCapacities[i].getMonth(), mhANDpProjects, teamEngagedProjects, team);
-//					
-//					// Get the TeamBucket for that month.
-//					TeamBucket tBucket = getTeamMonthBucket(teamBuckets, engagedTCapacities[i].getMonth());
-//					
-//					// Get the Team Capacity for that month.
-//					TeamCapacity tCapacity = getTeamMonthCapacity(teamCapacities, engagedTCapacities[i].getMonth());
-//					
-//					int projectsCountForMonth = monthProjects.size();
-//					
-//					// share the team capacity for each project on this month.
-//					
-//					if(projectsCountForMonth > 1) {
-//						double sharedCapacityForProject = (double)tCapacity.getManDays() / projectsCountForMonth;
-//						
-//						// Assign team work for each project based on restriction applied.
-//						Iterator<Project> pIterator = monthProjects.iterator();
-//						while(pIterator.hasNext()) {
-//							Project p = pIterator.next();
-//							if(p.getProjectType().getProjectTypeCode().equals(MHP)) {
-//								Double teamWorkForProject = sharedCapacityForProject * mhpRestriction.getTeamCapacityAllocation() /100;
-//								ProjectTeamWork ptWork = new ProjectTeamWork();
-//								addTeamWorkToBucket(teamWorkForProject, ptWork, p, tBucket, team,accumulatedTeamWork, monthProjects);
-//							}
-//							
-//							if(p.getProjectType().getProjectTypeCode().equals(PP)) {
-//								Double teamWorkForProject = sharedCapacityForProject* ppRestriction.getTeamCapacityAllocation() /100;
-//								ProjectTeamWork ptWork = new ProjectTeamWork();
-//								addTeamWorkToBucket(teamWorkForProject, ptWork, p, tBucket, team, accumulatedTeamWork, monthProjects);
-//							}
-//						}
-//					} else {
-//						Iterator<Project> pIterator = monthProjects.iterator();
-//						while(pIterator.hasNext()) {
-//							Project p = pIterator.next();
-//							if(p.getProjectType().getProjectTypeCode().equals(MHP)) {
-//								double teamWorkForProject = tCapacity.getManDays()* mhpRestriction.getTeamCapacityAllocation() /100;
-//								ProjectTeamWork ptWork = new ProjectTeamWork();
-//								addTeamWorkToBucket(teamWorkForProject, ptWork, p, tBucket, team, accumulatedTeamWork, monthProjects);
-//							}
-//							if(p.getProjectType().getProjectTypeCode().equals(PP)) {
-//								double teamWorkForProject = tCapacity.getManDays()* ppRestriction.getTeamCapacityAllocation() /100;
-//								ProjectTeamWork ptWork = new ProjectTeamWork();
-//								addTeamWorkToBucket(teamWorkForProject, ptWork, p, tBucket, team, accumulatedTeamWork, monthProjects);
-//							}
-//						}
-//					}
-//				} // for loop
-//				
-//				List<ProjectTeamWork> ptworks = team.getMissingTeamCapacity().getProjectTeamWorks();
-//				if(ptworks.size() > 0) {
-//					Double overflowWork = 0.00d;
-//					Iterator<ProjectTeamWork> ptIterator  = ptworks.iterator();
-//					while(ptIterator.hasNext()) {
-//						overflowWork = overflowWork + ptIterator.next().getEffort().doubleValue();
-//					}
-//					team.setOverflowWork(new BigDecimal(overflowWork.toString(), new MathContext(4)));
-//				}
-//				
-//			} // team iterator
-//		}
-//		
-//		// Get the Prioritized Strategic projects...
-//		SortedSet<Project> prioritizedProjects = getPrioritizedStrategicProjects(sProjects);
-//		Iterator<Project> prioritizedProjectIterator =  prioritizedProjects.iterator();
-//		while(prioritizedProjectIterator.hasNext()) {
-//			Project p = prioritizedProjectIterator.next();
-//			SortedSet<Team> projectTeams = p.getTeams();
-//			Iterator<Team> projectTeamIterator = projectTeams.iterator();
-//			while(projectTeamIterator.hasNext()) {
-//				Team pTeam = projectTeamIterator.next();
-//				pTeam.setCompletedProjectWork(false);
-//				BigDecimal accumulatedTeamWork = new BigDecimal(0) ;
-//				Iterator<TeamCapacity> capacityIterator = pTeam.getTeamCapacities().iterator();
-//					while (capacityIterator.hasNext()) {
-//						TeamCapacity tCapacity = capacityIterator.next();
-//						TeamBucket tBucket = getTeamMonthBucket(pTeam.getTeamBuckets(),tCapacity.getMonth());
-//						if(pTeam.hasCompletedProjectWork() == false) {
-//							addTeamWorkToBucketForSProject(p, tBucket, tCapacity,pTeam, accumulatedTeamWork, prioritizedProjects);
-//						}
-//					}	
-//			}
-//		}
-//		
-//		
-//		projectPortfolio.stringPortfolio();
-//		// Set the teams with team buckets back to ProjectPortfolio
-//		return projectPortfolio;
-//	}
-	
+
 	public ProjectPortfolio processProjectPortfolio(XSSFWorkbook workbook) throws Exception {
 		ProjectPortfolio projectPortfolio = readPortfolio(workbook);
 		SortedSet<Project> projects = projectPortfolio.getProjects();
@@ -905,37 +600,30 @@ public class ExcelManager {
 	
 	public LocalDate getLatestDeadline(SortedSet<Project> mhANDpProjects){
 		LocalDate lastestDeadlineMonth = null;
+        List<LocalDate> deadLinesList = new ArrayList<>();
 		LocalDate[] deadlines = new LocalDate[mhANDpProjects.size()];
 		int index = 0;
 		Iterator<Project> projectsIterator = mhANDpProjects.iterator();
 		while(projectsIterator.hasNext()) {
-			deadlines[index] = projectsIterator.next().getDeadlineMonth(); 
+            LocalDate deadlineMonth = projectsIterator.next().getDeadlineMonth();
+
+            if(deadlineMonth != null) {
+                deadLinesList.add(deadlineMonth);
+                deadlines[index] = deadlineMonth;
+            }
 			index++;
 		}
-		int compareValue = 0;
-		if(deadlines != null && deadlines.length == 1) {
-			lastestDeadlineMonth = deadlines[0]; 
-		} else {
-			for(int i=0; i<deadlines.length; i++) {
-				if(lastestDeadlineMonth == null) {
-					compareValue = deadlines[i].compareTo(deadlines[i+1]);
-					if(compareValue == 1){
-						lastestDeadlineMonth = deadlines[i]; 
-					} else if(compareValue == -1){
-						lastestDeadlineMonth = deadlines[i+1]; 
-					} else {
-						lastestDeadlineMonth = deadlines[i];
-					}
-					i++;	
-				} else {
-					compareValue = lastestDeadlineMonth.compareTo(deadlines[i]);
-					 if(compareValue == -1){
-						 lastestDeadlineMonth = deadlines[i]; 
-					 }
-				}
-			}
-		}
-		return lastestDeadlineMonth;
+
+        Collections.sort(deadLinesList,(o1, o2) -> {
+
+            System.out.println("d1 " +o1.toString("MMM YY"));
+            System.out.println("d2 " +o2.toString("MMM YY"));
+            if(o1.getYear() == o2.getYear() && o1.getMonthOfYear() == o2.getMonthOfYear()){
+                return 0;
+            }
+            return o1.compareTo(o2);
+        });
+        return deadLinesList.get(deadLinesList.size() - 1);
 	}
 	
 	public List<Project> getMonthlyProjects(LocalDate month, SortedSet<Project> mhANDpProjects, List<Project> teamEngagedProjects, Team team){
@@ -945,20 +633,23 @@ public class ExcelManager {
 		Iterator<Project> iterator = mhANDpProjects.iterator();
 		boolean isTeamWorkDoneForThisProject = false;
 		while(iterator.hasNext()) {
-			Project p = iterator.next();
+			Project project = iterator.next();
 			for (Map.Entry<String, Boolean> entry : team.getDoneWithProject().entrySet()) {
-				if(entry.getKey().equals(p.getName()) && entry.getValue() == true){
+				if(entry.getKey().equals(project.getName()) && entry.getValue() == true){
 					isTeamWorkDoneForThisProject = true;
-					teamEngagedProjects.remove(p);
+					teamEngagedProjects.remove(project);
 					break;
 				} else {
 					isTeamWorkDoneForThisProject = false;
 				}
 			}
 			if(!isTeamWorkDoneForThisProject) {
-				if(p.getDeadlineMonth().equals(month)){
-					if(p.getProjectType().getProjectTypeCode() == "MHP") mhProjects.add(p);
-					if(p.getProjectType().getProjectTypeCode() == "PP") pProjects.add(p);
+				if(project.getDeadlineMonth() != null && project.getDeadlineMonth().equals(month)){
+
+                    String projectTypeCode = project.getProjectType().getProjectTypeCode();
+
+                    if(projectTypeCode == "MHP") mhProjects.add(project);
+					if(projectTypeCode == "PP") pProjects.add(project);
 				}
 			}
 		}
@@ -974,9 +665,10 @@ public class ExcelManager {
 	public void addTeamWorkToBucket(double teamWorkForProject, ProjectTeamWork ptWork, Project p, TeamBucket tBucket, Team team, BigDecimal accumulatedTeamWork, List<Project> monthProjects,
 			double sharedCapacityForProject, TeamCapacity tCapacity, SortedSet<Project> mhANDpProjects) throws Exception{
 		TeamEffort te = null;
-//		tBucket.setAccumulatedTeamWork(teamWorkForProject);
 		double actualEffort = calculateTeamWorkOnCapacity(teamWorkForProject, p, team, tBucket, accumulatedTeamWork,monthProjects, sharedCapacityForProject, tCapacity);
-		ptWork.setEffort(BigDecimal.valueOf(actualEffort));
+
+        System.out.println("aufwand:" +actualEffort);
+        ptWork.setEffort(BigDecimal.valueOf(actualEffort));
 		ptWork.setProject(p);
 		ptWork.setProjectName(p.getName());
 		ptWork.setTeamName(team.getName());
@@ -1137,10 +829,6 @@ public class ExcelManager {
 		Iterator<Project> projectIterator = null;
 		boolean isFileUnlocked = false;
 		try {
-//			fileIn =  new FileInputStream(new File("C:\\bollu\\Projects\\Project_Portfolio\\Project_Portfolio_Workspace\\project_portfolio\\src\\com\\project\\portfolio\\resources\\013 Two-teams-two-mh-one-strategic-project.xlsx"));
-//			bIn = (BufferedInputStream)ExcelManager.class.getResourceAsStream("resources/013 Two-teams-two-mh-one-strategic-project.xlsx");
-//			fileIn =  new FileInputStream(new File("/resources/013 Two-teams-two-mh-one-strategic-project.xlsx"));
-//			portflioWorkBook = new XSSFWorkbook(bIn);
 			inputSheet = portflioWorkBook.getSheetAt(0);
 			Iterator<Row> rowIterator = inputSheet.iterator();
 			while (rowIterator.hasNext()) {
@@ -1249,9 +937,7 @@ public class ExcelManager {
 				}
 			}
 			
-//			bIn.close();
 			String userHomeDir = System.getProperty("user.home");
-//			userHomeDir.replaceAll("\\", "//");
 			String fileName = userHomeDir + "\\Desktop\\workbook.xls";
 			File existingFile = new File(fileName);
 			
@@ -1275,154 +961,4 @@ public class ExcelManager {
 		return writeToExcel;
 	}
 
-	
-//	public void writeToWorkBook(ProjectPortfolio projectPortfolio)  {
-//		XSSFWorkbook inputWB = null;
-//		FileOutputStream fileOut = null;
-//		BufferedInputStream bIn = null;
-//		XSSFSheet inputSheet = null;
-//		Row row = null;
-//		XSSFRow newRow = null;
-//		Cell cell = null;
-//		String cellValue = null;
-//		int rowNumber = 0;
-//		LocalDate[] monthsForEstimation= projectPortfolio.getMonthsForEstimation();
-//		Iterator<Team> teamIterator = null;
-//		Iterator<Project> projectIterator = null;
-//		boolean isFileUnlocked = false;
-//		try {
-////			fileIn =  new FileInputStream(new File("C:\\bollu\\Projects\\Project_Portfolio\\Project_Portfolio_Workspace\\project_portfolio\\src\\com\\project\\portfolio\\resources\\013 Two-teams-two-mh-one-strategic-project.xlsx"));
-//			bIn = (BufferedInputStream)ExcelManager.class.getResourceAsStream("resources/013 Two-teams-two-mh-one-strategic-project.xlsx");
-////			fileIn =  new FileInputStream(new File("/resources/013 Two-teams-two-mh-one-strategic-project.xlsx"));
-//			inputWB = new XSSFWorkbook(bIn);
-//			inputSheet = inputWB.getSheetAt(0);
-//			Iterator<Row> rowIterator = inputSheet.iterator();
-//			while (rowIterator.hasNext()) {
-//				row = rowIterator.next();
-//				cell = row.getCell(0);
-//				if(cell != null) {
-//					if(cell.getCellType() ==  0){
-//						cellValue = cell.getDateCellValue().toString();
-//					} else cellValue = cell.getStringCellValue();
-//				} else continue;
-//				cellValue = cellValue.toLowerCase();
-//				if(!cellValue.equals("effort")) {
-//					continue;
-//				} else {
-//					rowNumber =  row.getRowNum();
-//					newRow = inputSheet.createRow(rowNumber + projectPortfolio.getTeams().size() + 1);
-//					newRow.createCell(0).setCellValue("OUTPUT");
-//					// Place the Projects...
-//					newRow = inputSheet.createRow(newRow.getRowNum() + 1);
-//					newRow.createCell(0).setCellValue("");
-//					projectIterator = projectPortfolio.getProjects().iterator();
-//					int columnIndex = 1;
-//					while(projectIterator.hasNext()) {
-//						Project p = projectIterator.next();
-//						newRow.createCell(columnIndex).setCellValue(p.getName());;
-//						columnIndex = columnIndex +  projectPortfolio.getTeams().size();
-//					}
-//					
-//					newRow = inputSheet.createRow(newRow.getRowNum() + 1);
-//					newRow.createCell(0).setCellValue("month");
-//					projectIterator = projectPortfolio.getProjects().iterator();
-//					columnIndex = 1;
-//					while(projectIterator.hasNext()) {
-//						Project project = projectIterator.next();
-//						teamIterator = projectPortfolio.getTeams().iterator();
-//						while(teamIterator.hasNext()) {
-//							Team team = teamIterator.next();
-//							newRow.createCell(columnIndex).setCellValue(team.getName());;
-//							columnIndex++; 
-//						}
-//					}
-//					
-//					// Add Team Work..
-//					for(int i = 0; i < monthsForEstimation.length; i++) {
-//						newRow = inputSheet.createRow(newRow.getRowNum() + 1);
-//						newRow.createCell(0).setCellValue(monthsForEstimation[i].toString());
-//						projectIterator = projectPortfolio.getProjects().iterator();
-//						columnIndex = 1; 
-//						while(projectIterator.hasNext()) {
-//							Project project = projectIterator.next();
-//							teamIterator = projectPortfolio.getTeams().iterator();
-//							while(teamIterator.hasNext()) {
-//								Team team = teamIterator.next();
-//								TeamBucket tBucket = getTeamMonthBucket(team.getTeamBuckets(), monthsForEstimation[i]);
-//								ProjectTeamWork ptWork = getProjectTeamWork(tBucket, project, team);
-//								if(ptWork != null) {
-//									newRow.createCell(columnIndex).setCellValue(ptWork.getEffort().doubleValue());
-//								}
-//								columnIndex++;
-//							}
-//						}
-//					}
-//					
-//					// Add Overflow...
-//					newRow = inputSheet.createRow(newRow.getRowNum() + 1);
-//					newRow.createCell(0).setCellValue("Overflow");
-//					teamIterator = projectPortfolio.getTeams().iterator();
-//					 columnIndex = 1;
-//					while(teamIterator.hasNext()) {
-//						Team team = teamIterator.next();
-//						newRow.createCell(columnIndex).setCellValue(team.getName());
-//						columnIndex++;
-//					}
-//					newRow = inputSheet.createRow(newRow.getRowNum() + 1);
-//					newRow.createCell(0).setCellValue("");
-//					teamIterator = projectPortfolio.getTeams().iterator();
-//					columnIndex = 1;
-//					while(teamIterator.hasNext()) {
-//						Team team = teamIterator.next();
-//						newRow.createCell(columnIndex).setCellValue(team.getOverflowWork().doubleValue());
-//						columnIndex++;
-//					}
-//					newRow = inputSheet.createRow(newRow.getRowNum() + 1);
-//					
-//					// Add Projects DeadLines...
-//					newRow = inputSheet.createRow(newRow.getRowNum() + 1);
-//					newRow.createCell(0).setCellValue("projects");
-//					projectIterator = projectPortfolio.getProjects().iterator();
-//					columnIndex = 1;
-//					while(projectIterator.hasNext()) {
-//						Project project = projectIterator.next();
-//						newRow.createCell(columnIndex).setCellValue(project.getName());
-//						columnIndex++;
-//					}
-//					newRow = inputSheet.createRow(newRow.getRowNum() + 1);
-//					newRow.createCell(0).setCellValue("deadline (last month)");
-//					projectIterator = projectPortfolio.getProjects().iterator();
-//					columnIndex = 1;
-//					while(projectIterator.hasNext()) {
-//						Project project = projectIterator.next();
-//						newRow.createCell(columnIndex).setCellValue(project.getDeadlineMonth().toString());
-//						columnIndex++;
-//					}
-//					
-//					break;
-//				}
-//			}
-//			
-//			bIn.close();
-//			String userHomeDir = System.getProperty("user.home");
-////			userHomeDir.replaceAll("\\", "//");
-//			String fileName = userHomeDir + "\\Desktop\\workbook.xls";
-//			File existingFile = new File(fileName);
-//			
-//			try {
-//			org.apache.commons.io.FileUtils.touch(existingFile);
-//			isFileUnlocked = true;
-//			
-//			} catch(IOException ioe) {
-//				isFileUnlocked = false;
-//			}
-//			if(isFileUnlocked) {
-//				fileOut = new FileOutputStream(existingFile);
-//				inputWB.write(fileOut);
-//			    fileOut.close();
-//			}
-//		} catch(Exception e) {
-//			e.printStackTrace();
-//		}
-//	}
 }

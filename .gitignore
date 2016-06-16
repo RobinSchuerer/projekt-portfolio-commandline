@@ -5,3 +5,8 @@ build/
 !gradle-wrapper.jar
 ProjektPortfolio.iml
 ProjektPortfolio.ipr
+out/
+src/main/resources/static/css/
+src/main/resources/static/uploads/
+src/test/resources/009 Two-teams-two-mh-one-strategic-project_b.xlsx
+src/test/resources/Video.txt
