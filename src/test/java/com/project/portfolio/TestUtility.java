@@ -38,7 +38,7 @@ public class TestUtility {
 					ProjectTeamWork actualProjectWork = getTeamWorkOnProject(teamWork, works);
 					if(actualProjectWork != null) {
 
-						assertEquals(teamWork.getEffort(), getTeamWorkOnProject(teamWork, works).getEffort());
+						assertEquals(getTeamWorkOnProject(teamWork, works).getEffort(), teamWork.getEffort());
 					}
 					
 				}
