@@ -66,7 +66,7 @@ public class ProjectTeamWork implements Serializable {
 	}
 
 	public BigDecimal getEffort() {
-		return this.effort;
+		return this.effort.setScale(1, BigDecimal.ROUND_HALF_UP);
 	}
 
 	public void setEffort(BigDecimal effort) {
@@ -113,6 +113,8 @@ public class ProjectTeamWork implements Serializable {
 		this.month = month;
 	}
 
-
-
+	@Override
+	public String toString() {
+		return teamName +", " + projectName + ", " + month.toString("MMM YY")+ ", " + effort;
+	}
 }
