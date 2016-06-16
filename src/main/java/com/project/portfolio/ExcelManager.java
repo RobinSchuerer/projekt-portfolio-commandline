@@ -40,7 +40,7 @@ public class ExcelManager {
             // erste Zelle der Zeile soll Portfolio sein
             Cell ersteZelle = zeile.getCell(0);
             if(ersteZelle.getCellType() == Cell.CELL_TYPE_STRING && "portfolio".equals(ersteZelle.getStringCellValue())){
-                return zeile.getCell(2).getStringCellValue();
+                return zeile.getCell(1).getStringCellValue();
             }
         }
 
