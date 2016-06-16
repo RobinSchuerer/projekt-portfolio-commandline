@@ -5,15 +5,12 @@ import com.project.portfolio.TestUtility;
 import com.project.portfolio.domain.*;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.joda.time.LocalDate;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.BufferedInputStream;
-import java.math.BigDecimal;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -46,96 +43,8 @@ public class ProjectPortfolio_1T_4MP_3PP_Test {
 	@Test
 	public void test1T4MP3PP() {
 		assertNotNull(workbook);
-		
-		List<ProjectTeamWork> works = new ArrayList<ProjectTeamWork>();
-		
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2), "Project1", "Team1", new LocalDate(2016, 12, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2), "Project1", "Team1", new LocalDate(2016, 11, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2), "Project1", "Team1", new LocalDate(2016, 10, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2), "Project1", "Team1", new LocalDate(2016, 9, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(1.3333333333333335), "Project1", "Team1", new LocalDate(2016, 8, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(1.866666666666667), "Project1", "Team1", new LocalDate(2016, 7, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.666666666666667), "Project1", "Team1", new LocalDate(2016, 6, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.666666666666667), "Project1", "Team1", new LocalDate(2016, 5, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.666666666666667), "Project1", "Team1", new LocalDate(2016, 4, 1)));
-		
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2), "Project2", "Team1", new LocalDate(2016, 10, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2), "Project2", "Team1", new LocalDate(2016, 9, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(1.3333333333333335), "Project2", "Team1", new LocalDate(2016, 8, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(1.866666666666667), "Project2", "Team1", new LocalDate(2016, 7, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.666666666666667), "Project2", "Team1", new LocalDate(2016, 6, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.666666666666667), "Project2", "Team1", new LocalDate(2016, 5, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.666666666666667), "Project2", "Team1", new LocalDate(2016, 4, 1)));
-		
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(8), "Project3", "Team1", new LocalDate(2017, 8, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(7), "Project3", "Team1", new LocalDate(2017, 7, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2017, 6, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2017, 5, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2017, 4, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2017, 3, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2017, 2, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2017, 1, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2016, 12, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2016, 11, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2016, 10, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2016, 9, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2016, 8, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2016, 7, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2016, 6, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2016, 5, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project3", "Team1", new LocalDate(2016, 4, 1)));
-		
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(8), "Project4", "Team1", new LocalDate(2017, 12, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2), "Project4", "Team1", new LocalDate(2017, 11, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2017, 10, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2017, 9, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2017, 8, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2017, 7, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2017, 6, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2017, 5, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2017, 4, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2017, 3, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2017, 2, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2017, 1, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2016, 12, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2016, 11, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2016, 10, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2016, 9, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2016, 8, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2016, 7, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2016, 6, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2016, 5, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project4", "Team1", new LocalDate(2016, 4, 1)));
-		
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.5), "Project5", "Team1", new LocalDate(2016, 12, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.5), "Project5", "Team1", new LocalDate(2016, 11, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.5), "Project5", "Team1", new LocalDate(2016, 10, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.5), "Project5", "Team1", new LocalDate(2016, 9, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(1.666666666666667), "Project5", "Team1", new LocalDate(2016, 8, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.3333333333333335), "Project5", "Team1", new LocalDate(2016, 7, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(3.333333333333334), "Project5", "Team1", new LocalDate(2016, 6, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(3.333333333333334), "Project5", "Team1", new LocalDate(2016, 5, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(3.333333333333334), "Project5", "Team1", new LocalDate(2016, 4, 1)));
-		
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.5), "Project6", "Team1", new LocalDate(2016, 12, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.5), "Project6", "Team1", new LocalDate(2016, 11, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.5), "Project6", "Team1", new LocalDate(2016, 10, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.5), "Project6", "Team1", new LocalDate(2016, 9, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project6", "Team1", new LocalDate(2016, 8, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project6", "Team1", new LocalDate(2016, 7, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project6", "Team1", new LocalDate(2016, 6, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project6", "Team1", new LocalDate(2016, 5, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project6", "Team1", new LocalDate(2016, 4, 1)));
-		
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.5), "Project6", "Team1", new LocalDate(2016, 12, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(2.5), "Project6", "Team1", new LocalDate(2016, 11, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project6", "Team1", new LocalDate(2016, 10, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project6", "Team1", new LocalDate(2016, 9, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project6", "Team1", new LocalDate(2016, 8, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project6", "Team1", new LocalDate(2016, 7, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project6", "Team1", new LocalDate(2016, 6, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project6", "Team1", new LocalDate(2016, 5, 1)));
-		works.add(new ProjectTeamWork(BigDecimal.valueOf(0), "Project6", "Team1", new LocalDate(2016, 4, 1)));
+
+		List<ProjectTeamWork> works = TestUtility.readAssertations(this.workbook);
 
 
 		try {
