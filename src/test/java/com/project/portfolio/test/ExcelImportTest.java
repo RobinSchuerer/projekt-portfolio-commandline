@@ -24,7 +24,7 @@ public class ExcelImportTest {
 
     @Before
     public void setUp() throws Exception {
-        Path resPath = Paths.get(getClass().getResource("/012 Many-teams-many-projects Portfolio LV1871_1.xlsx").toURI());
+        Path resPath = Paths.get(getClass().getResource("/lv-projekte.xlsx").toURI());
 
         workbook = new XSSFWorkbook(Files.newInputStream(resPath));
     }
