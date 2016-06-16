@@ -1,0 +1,22 @@
+<table id="table1" class="table table-bordered table-striped">
+  <thead>
+  <tr style="background-color:#C5C5C5;">
+    <th>&nbsp;</th>
+    <th>&nbsp;</th>
+    <th ng-repeat="bucket in buckets" style="width:60px" align="center">{{bucket.bucketMonth | formatDate}}</th>
+  </tr>
+  </thead>
+  <tbody>
+
+  <tr ng-repeat="teamProjectWork in projectTeamWorks" ng-if="portfolio.teams.length" style="background-color: #f0f0f5;">
+    <td ng-style="{'background-color': teamColors[teamProjectWork.name] }">{{teamProjectWork.name | split:'-':0}}</td>
+    <td >{{teamProjectWork.name | split:'-':1}}</td>
+    <td ng-repeat="teamWork in teamProjectWork.value"    ng-style="{'background-color': teamWork.color}" style="width:60px">
+						{{teamWork.effort}}
+				</td>
+	<td bgcolor="#cc0066"  align="center">
+		{{teamProjectWork.name | split:'-':2}} MD
+	</td>
+  </tr>
+  </tbody>
+</table>

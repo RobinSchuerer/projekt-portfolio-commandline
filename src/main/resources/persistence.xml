@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="2.1" xmlns="http://xmlns.jcp.org/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence http://xmlns.jcp.org/xml/ns/persistence/persistence_2_1.xsd">
+	<persistence-unit name="projectPortfolio" transaction-type='RESOURCE_LOCAL'>
+	<non-jta-data-source>java:comp/env/jdbc/projectPortfolio</non-jta-data-source>
+		<class>com.project.portfolio.domain.Project</class>
+		<class>com.project.portfolio.domain.ProjectPortfolio</class>
+		<class>com.project.portfolio.domain.ProjectTeamWork</class>
+		<class>com.project.portfolio.domain.ProjectType</class>
+		<class>com.project.portfolio.domain.Restriction</class>
+		<class>com.project.portfolio.domain.Team</class>
+		<class>com.project.portfolio.domain.TeamBucket</class>
+		<class>com.project.portfolio.domain.TeamCapacity</class>
+		<class>com.project.portfolio.domain.TeamEffort</class>
+		<class>com.project.portfolio.domain.ProjectTeam</class>
+		<properties>
+    		<property name="javax.persistence.nonJtaDataSource" value="java:comp/env/jdbc/projectPortfolio"/>
+ 	  	</properties>
+	</persistence-unit>
+</persistence>

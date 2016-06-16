@@ -1,0 +1,7 @@
+.idea
+*.iws
+.gradle
+build/
+!gradle-wrapper.jar
+ProjektPortfolio.iml
+ProjektPortfolio.ipr

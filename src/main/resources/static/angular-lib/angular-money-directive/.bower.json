@@ -1,0 +1,24 @@
+{
+  "name": "angular-money-directive",
+  "version": "1.1.1",
+  "main": "angular-money-directive.js",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "components"
+  ],
+  "devDependencies": {
+    "angular": "~1.2.16",
+    "angular-mocks": "~1.2.16"
+  },
+  "homepage": "https://github.com/loosebits/angular-money-directive",
+  "_release": "1.1.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "1.1.1",
+    "commit": "2d8c264d500d6a04f0716d839d3f28e02ab002b4"
+  },
+  "_source": "https://github.com/loosebits/angular-money-directive.git",
+  "_target": "1.1.1",
+  "_originalSource": "https://github.com/loosebits/angular-money-directive.git"
+}

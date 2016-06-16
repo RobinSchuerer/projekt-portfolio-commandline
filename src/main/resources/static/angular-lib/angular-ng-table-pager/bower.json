@@ -1,0 +1,16 @@
+{
+  "name": "angular-ng-table-pager",
+  "version": "0.0.0",
+  "authors": [
+    "Rand McNeely <randall_mcneely@bcbstx.com>"
+  ],
+  "description": "Pager for ng-table",
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

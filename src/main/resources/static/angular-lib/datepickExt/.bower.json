@@ -1,0 +1,15 @@
+{
+  "name": "datepickExt",
+  "homepage": "https://github.com/Schmu/datepickExt",
+  "version": "4.1.0",
+  "_release": "4.1.0",
+  "_resolution": {
+    "type": "version",
+    "tag": "4.1.0",
+    "commit": "c1e69a7f1a475760f8c6ed1ccd717f761215f2e7"
+  },
+  "_source": "https://github.com/Schmu/datepickExt.git",
+  "_target": "4.1.0",
+  "_originalSource": "https://github.com/Schmu/datepickExt.git",
+  "_direct": true
+}

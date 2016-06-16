@@ -1,0 +1,129 @@
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Project Portfolio</title>
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css" />
+<link rel="stylesheet" href="directive/freezepane.css" />
+
+<style>
+
+table td { 
+	border: 1px solid black;
+    overflow: hidden;
+    height:50px;
+    text-align: center;
+}
+
+#projects {
+border : 1px solid black;
+}
+
+.headerBorder {
+style=" border: 1px solid black;"
+}
+
+[ng\:cloak], [ng-cloak], [data-ng-cloak], [x-ng-cloak],
+.ng-cloak, .x-ng-cloak,
+.ng-hide {
+  display: none !important;
+}
+
+.progressSpinner {
+	position: absolute; top: 20px; bottom: 80px; left: 450px; right: 130px; width: 600px; height: 100px;
+}
+
+.progressText {
+  position: absolute; top: 125px; bottom: 80px; right: 130px; width: 600px; height: 100px;
+}
+
+
+</style>
+</head>
+<body id="portfolio" ng-app="project-portfolio">
+	<form name="portfolioForm"  id="portfolioForm" ng-controller="portfolioController" method="POST" ng-submit="submitForm()">
+		<div style="margin-top:30px; width: 300px;">
+			<input type="file"  ng-file-select="onFileSelect($files)" name="file" id="file" value="upload"/>
+		</div>
+		<div style="margin-top:30px; width: 300px;">
+			<input type="button"  ng-click="onExportFile()" name="export" value="Export"/>
+		</div>
+		<div ng-show="loadingProducts" class="progressSpinner">
+			<div>
+				<img src="img/spinner.gif" width="144" height="144" />
+			</div>
+			<div class="progressText">
+				<p>
+					<strong>We are retrieving project portfolio information. This
+							may take a few seconds.</strong>
+				</p>
+			</div>
+		</div>
+		<div style="border-style: none; margin-top:25px;" ng-cloak ng-show="!loadingProducts">
+		<div ng-if="showSucess">Excel has uploaded successfully</div>
+		
+		<tablefreeze  ng-if="showProfile" tableId="table1" freezeRows="1" freezeCols="1"
+               tableTemplateUrl="template/table.html"></tablefreeze>
+		
+		
+<div style="margin-top:50px; width: 700px;">
+	<table id="projects" ng-if="showProfile" style="background-color: #f0f0f5; border-collapse: collapse; border: 1px solid black;">
+		<tr>
+		<th class="headerBorder">Project Name</th>
+		<th class="headerBorder">Project Color</th>
+		<th class="headerBorder">Project Type</th>
+		<th class="headerBorder">Execution Month</th>
+		<th class="headerBorder">Deadline Month</th>
+		<th class="headerBorder">Causing overflow in teams</th>
+		</tr>
+		<tr  ng-repeat="project in portfolio.projects">
+		<td>{{project.name}}</td>
+		<td ng-style="{'background-color': project.color}"></td>
+		<td>{{project.projectType.name}}</td>
+		<td>{{project.executionMonth | formatDate}}</td>
+		<td>{{project.deadlineMonth | formatDate}}</td>
+		<td>
+			<span ng-repeat="project2 in portfolio.teams">
+				<span ng-repeat="teamprojectn in project2.projects">
+					<span ng-if="teamprojectn.name==project.name">
+					 {{project2.name}} ({{project2.overflowWork}})<label ng-if="project2.$index != portfolio.teams.length">,</label>
+					</span>
+				</span>
+			</span>	
+		</td>
+			
+		</tr>
+	</table>
+</div>
+
+
+</div>
+
+ 
+</form>
+<script src='angular-lib/lodash/lodash.min.js'></script>
+<script src='angular-lib/stacktrace/stacktrace.min.js'></script>
+<script src='angular-lib/moment/moment.js'></script>
+<script src='angular-lib/angular/angular.min.js'></script>
+<script src='angular-lib/angular-sanitize/angular-sanitize.min.js'></script>
+<script src='angular-lib/ng-biscuit/dist/ng-biscuit.min.js'></script>
+<script src='angular-lib/angular-formatter-parser/dist/angular-formatter-parser.min.js'></script>
+<script src='angular-lib/angular-resource/angular-resource.min.js'></script>
+<script src='angular-lib/angular-inflector/dist/angular-inflector.min.js'></script>
+<script src='angular-lib/angular-validate/dist/angular-validate.min.js'></script>
+<script src='angular-lib/angular-exception-post/dist/angular-exception-post.min.js'></script>
+<script src='angular-lib/angular-translate/angular-translate.min.js'></script>
+<script src='angular-lib/angular-money-directive/angular-money-directive.js'></script>
+<script src='angular-lib/angular-http-throttler/service/http-throttler.js'></script>
+<script src='angular-lib/angular-bootstrap/ui-bootstrap-tpls.min.js'></script>
+<script src='angular-lib/ng-table/dist/ng-table.min.js'></script>
+<script src='angular-lib/angular-ng-table-pager/src/ng-table-pager.js'></script>
+<script src='angular-lib/ng-file-upload/angular-file-upload.min.js'></script>
+<script src='angular-lib/angular-toArrayFilter/toArrayFilter.js'></script>
+<script src='directive/jquery.js'></script>
+<script src='directive/freezepane.js'></script>
+
+<!-- Load the application scripts -->
+<script src='javascript/app.js'></script>
+<script src='javascript/controller.js'></script>
+</body>
+</html>
