@@ -13,6 +13,15 @@ public class ProjektAufwand {
     private Projekt projekt;
     private Map<Team, BigDecimal> aufwaende = new HashMap<>();
 
+    private ProjektAufwand(Builder builder) {
+        setProjekt(builder.projekt);
+        setAufwaende(builder.aufwaende);
+    }
+
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
     public Projekt getProjekt() {
         return projekt;
     }
@@ -27,5 +36,28 @@ public class ProjektAufwand {
 
     public void setAufwaende(Map<Team, BigDecimal> aufwaende) {
         this.aufwaende = aufwaende;
+    }
+
+
+    public static final class Builder {
+        private Projekt projekt;
+        private Map<Team, BigDecimal> aufwaende;
+
+        private Builder() {
+        }
+
+        public Builder withProjekt(Projekt val) {
+            projekt = val;
+            return this;
+        }
+
+        public Builder withAufwaende(Map<Team, BigDecimal> val) {
+            aufwaende = val;
+            return this;
+        }
+
+        public ProjektAufwand build() {
+            return new ProjektAufwand(this);
+        }
     }
 }

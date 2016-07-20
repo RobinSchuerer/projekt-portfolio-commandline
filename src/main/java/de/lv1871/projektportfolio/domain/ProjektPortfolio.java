@@ -1,6 +1,8 @@
 package de.lv1871.projektportfolio.domain;
 
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Created by SchuererR on 16.06.2016.
@@ -31,6 +33,10 @@ public class ProjektPortfolio {
         return beschraenkungen;
     }
 
+    public Set<Team> getTeams(){
+        return teamKapazitaeten.stream().map(k->k.getTeam()).collect(Collectors.toSet());
+    }
+
     public List<TeamKapazitaet> getTeamKapazitaeten() {
         return teamKapazitaeten;
     }
@@ -59,7 +65,15 @@ public class ProjektPortfolio {
         }
 
         public Builder withTeamKapazitaeten(List<TeamKapazitaet> val) {
-            teamKapazitaeten = val;
+            teamKapazitaeten = val.stream().sorted(
+
+                    (t1,t2)-> {
+                        int nameComparison = t1.getTeam().getName().compareTo(t2.getTeam().getName());
+                        if(nameComparison == 0) return t1.getMonat().compareTo(t2.getMonat());
+
+                        return nameComparison;
+
+                    }).collect(Collectors.toList());
             return this;
         }
 
