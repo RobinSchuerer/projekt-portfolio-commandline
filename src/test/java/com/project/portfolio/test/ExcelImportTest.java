@@ -218,6 +218,10 @@ public class ExcelImportTest {
 
         assertTrue(projektAufwand.isPresent());
 
+        assertEquals("BasisRiester", projektAufwand.get().getProjekt().getName());
+        assertEquals("BasisRiester", projektAufwand.get().getProjekt().getPrioritaet());
+        assertEquals("BasisRiester", projektAufwand.get().getProjekt().getDeadLine());
+        assertEquals("BasisRiester", projektAufwand.get().getProjekt().getTyp());
 
     }
 

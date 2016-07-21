@@ -1,7 +1,6 @@
 package com.project.portfolio.web;
 
 import de.lv1871.projektportfolio.domain.*;
-import org.apache.poi.ss.formula.functions.Intercept;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.xssf.usermodel.XSSFCell;
@@ -14,10 +13,10 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_BLANK;
+import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
 
 /**
@@ -63,22 +62,69 @@ public class ProjektPortfolioExcelReader {
     }
 
     private Map<Team, Integer> getTeamMap(XSSFSheet sheet) {
-        int indexProjektZeile = getIndexOfZeileStartingWithValue(sheet, "projects");
+        int indexEffortZeile = getIndexOfZeileStartingWithValue(sheet, "effort");
 
-        XSSFRow projekteZeile = sheet.getRow(indexProjektZeile);
 
-        for (int i = 2; i < Integer.MAX_VALUE; i++) {
-            XSSFCell projektNameCell = projekteZeile.getCell(i);
-            if(projektNameCell == null || projektNameCell.getCellType() != CELL_TYPE_STRING){
+        Map<Team, Integer> result = new HashMap<>();
+
+        for (int i = indexEffortZeile; i < Integer.MAX_VALUE; i++) {
+            XSSFRow teamZeile = sheet.getRow(i);
+            XSSFCell teamCell = teamZeile.getCell(i);
+            if(teamCell == null || teamCell.getCellType() != CELL_TYPE_STRING){
                 break;
             }
 
-
+            Team team = Team
+                    .newBuilder()
+                    .withName(teamCell.getStringCellValue())
+                    .build();
+            result.put(team, i);
         }
 
+        return result;
     }
 
     private Map<Projekt, Integer> getProjektMap(XSSFSheet sheet) {
+
+        Map<Projekt, Integer> result = new HashMap<>();
+        int indexProjektZeile = getIndexOfZeileStartingWithValue(sheet, "projects");
+
+        XSSFRow projektZeile = sheet.getRow(indexProjektZeile);
+        XSSFRow projektTypZeile = sheet.getRow(indexProjektZeile+1);
+        XSSFRow prioZeile = sheet.getRow(indexProjektZeile+2);
+        XSSFRow deadlineZeile = sheet.getRow(indexProjektZeile+3);
+
+        for (int i = 2; i < Integer.MAX_VALUE ; i++) {
+            XSSFCell projektNameCell = projektZeile.getCell(i);
+            if(projektNameCell == null || projektNameCell.getCellType() == CELL_TYPE_BLANK){
+                break;
+            }
+
+            String typValue = projektTypZeile.getCell(i).getStringCellValue();
+            double prioValue = prioZeile.getCell(i).getNumericCellValue();
+
+            XSSFCell deadlineCell = deadlineZeile.getCell(i);
+
+            Projekt projekt = Projekt
+                    .newBuilder()
+                    .withName(projektNameCell.getStringCellValue())
+                    .withPrioritaet(new BigDecimal(prioValue).intValue())
+                    .withDeadLine( getDeadLine(deadlineCell))
+                    .withTyp(ProjektTyp.parse(typValue))
+                    .build();
+            result.put(projekt,i);
+        }
+
+        return result;
+    }
+
+    private LocalDate getDeadLine(XSSFCell deadlineCell) {
+        if(deadlineCell.getCellType() != CELL_TYPE_NUMERIC ){
+            return null;
+        }
+
+        Date deadlineValue = deadlineCell.getDateCellValue();
+        return from(deadlineValue);
     }
 
     private List<Beschraenkung> readBeschraenkungen(XSSFSheet sheet) {
