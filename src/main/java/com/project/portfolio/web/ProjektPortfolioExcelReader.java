@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_BLANK;
@@ -24,7 +25,7 @@ import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
  */
 public class ProjektPortfolioExcelReader {
 
-    public ProjektPortfolio read(XSSFWorkbook workbook) throws Exception {
+    public ProjektPortfolio read(XSSFWorkbook workbook) {
         XSSFSheet sheet = workbook.getSheetAt(0);
 
         String portfolioName = getPortfolioName(sheet);
@@ -36,7 +37,6 @@ public class ProjektPortfolioExcelReader {
                 .withBeschraenkungen(readBeschraenkungen(sheet))
                 .withProjektAufwaende(readProjektAufwaende(sheet))
                 .build();
-
     }
 
     private List<ProjektAufwand> readProjektAufwaende(XSSFSheet sheet) {
@@ -48,17 +48,30 @@ public class ProjektPortfolioExcelReader {
         Map<Team, Integer> teams = getTeamMap(sheet);
 
         // transformation in projekte und die aufwände für dieses projekt
-        return projekte.entrySet().stream().map(p -> {
-            Projekt projekt = p.getKey();
+        Function<Map.Entry<Projekt, Integer>, ProjektAufwand> entryProjektAufwandMapper = newProjektAufwandMapper(sheet, teams);
+        return projekte
+                .entrySet()
+                .stream()
+                .map(entryProjektAufwandMapper)
+                .collect(Collectors.toList());
+    }
 
-            Map<Team, BigDecimal> aufwaende = teams.entrySet().stream().collect(Collectors.toMap(t -> t.getKey(), t -> {
-                double aufwand = sheet.getRow(t.getValue()).getCell(p.getValue()).getNumericCellValue();
-                return new BigDecimal(aufwand);
-            }));
+    private Function<Map.Entry<Projekt, Integer>, ProjektAufwand> newProjektAufwandMapper(XSSFSheet sheet, Map<Team, Integer> teams) {
+        return entry -> {
+            Projekt projekt = entry.getKey();
+
+            Map<Team, BigDecimal> aufwaende = teams.entrySet().stream().collect(Collectors.toMap(t -> t.getKey(), newValueMapper(sheet, entry)));
 
             return ProjektAufwand.newBuilder().withProjekt(projekt).withAufwaende(aufwaende).build();
 
-        }).collect(Collectors.toList());
+        };
+    }
+
+    private Function<Map.Entry<Team, Integer>, BigDecimal> newValueMapper(XSSFSheet sheet, Map.Entry<Projekt, Integer> projektMap) {
+        return entry -> {
+            double aufwand = sheet.getRow(entry.getValue()).getCell(projektMap.getValue()).getNumericCellValue();
+            return new BigDecimal(aufwand);
+        };
     }
 
     private Map<Team, Integer> getTeamMap(XSSFSheet sheet) {
@@ -70,7 +83,7 @@ public class ProjektPortfolioExcelReader {
         for (int i = indexEffortZeile; i < Integer.MAX_VALUE; i++) {
             XSSFRow teamZeile = sheet.getRow(i);
             XSSFCell teamCell = teamZeile.getCell(i);
-            if(teamCell == null || teamCell.getCellType() != CELL_TYPE_STRING){
+            if (teamCell == null || teamCell.getCellType() != CELL_TYPE_STRING) {
                 break;
             }
 
@@ -90,13 +103,13 @@ public class ProjektPortfolioExcelReader {
         int indexProjektZeile = getIndexOfZeileStartingWithValue(sheet, "projects");
 
         XSSFRow projektZeile = sheet.getRow(indexProjektZeile);
-        XSSFRow projektTypZeile = sheet.getRow(indexProjektZeile+1);
-        XSSFRow prioZeile = sheet.getRow(indexProjektZeile+2);
-        XSSFRow deadlineZeile = sheet.getRow(indexProjektZeile+3);
+        XSSFRow projektTypZeile = sheet.getRow(indexProjektZeile + 1);
+        XSSFRow prioZeile = sheet.getRow(indexProjektZeile + 2);
+        XSSFRow deadlineZeile = sheet.getRow(indexProjektZeile + 3);
 
-        for (int i = 2; i < Integer.MAX_VALUE ; i++) {
+        for (int i = 2; i < Integer.MAX_VALUE; i++) {
             XSSFCell projektNameCell = projektZeile.getCell(i);
-            if(projektNameCell == null || projektNameCell.getCellType() == CELL_TYPE_BLANK){
+            if (projektNameCell == null || projektNameCell.getCellType() == CELL_TYPE_BLANK) {
                 break;
             }
 
@@ -109,17 +122,17 @@ public class ProjektPortfolioExcelReader {
                     .newBuilder()
                     .withName(projektNameCell.getStringCellValue())
                     .withPrioritaet(new BigDecimal(prioValue).intValue())
-                    .withDeadLine( getDeadLine(deadlineCell))
+                    .withDeadLine(getDeadLine(deadlineCell))
                     .withTyp(ProjektTyp.parse(typValue))
                     .build();
-            result.put(projekt,i);
+            result.put(projekt, i);
         }
 
         return result;
     }
 
     private LocalDate getDeadLine(XSSFCell deadlineCell) {
-        if(deadlineCell.getCellType() != CELL_TYPE_NUMERIC ){
+        if (deadlineCell.getCellType() != CELL_TYPE_NUMERIC) {
             return null;
         }
 
@@ -135,6 +148,9 @@ public class ProjektPortfolioExcelReader {
         for (int i = index; i < index + 99; i++) {
             Row row = sheet.getRow(i);
 
+            if (row == null) {
+                break;
+            }
 
             Cell cell1 = row.getCell(0);
             Cell cell2 = row.getCell(1);

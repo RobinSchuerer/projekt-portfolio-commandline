@@ -11,14 +11,14 @@ import java.math.BigDecimal;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 /**
  * Created by SchuererR on 16.06.2016.
@@ -218,11 +218,45 @@ public class ExcelImportTest {
 
         assertTrue(projektAufwand.isPresent());
 
-        assertEquals("BasisRiester", projektAufwand.get().getProjekt().getName());
-        assertEquals("BasisRiester", projektAufwand.get().getProjekt().getPrioritaet());
-        assertEquals("BasisRiester", projektAufwand.get().getProjekt().getDeadLine());
-        assertEquals("BasisRiester", projektAufwand.get().getProjekt().getTyp());
+        Projekt projekt = projektAufwand.get().getProjekt();
+        assertEquals("BasisRiester", projekt.getName());
+        assertEquals(0, projekt.getPrioritaet());
+        assertEquals("Dez 16", projekt.getDeadLine().format(DateTimeFormatter.ofPattern("MMM YY")));
+        assertEquals(ProjektTyp.MUSS_PROJEKT, projekt.getTyp());
+    }
 
+    @Test
+    public void mtextNacharbeiten() throws Exception {
+
+        Optional<ProjektAufwand> projektAufwand = getProjektAufwand("MtextNacharb");
+
+        assertTrue(projektAufwand.isPresent());
+
+        Projekt projekt = projektAufwand.get().getProjekt();
+        assertEquals("MtextNacharb", projekt.getName());
+        assertEquals(32, projekt.getPrioritaet());
+        assertNull( projekt.getDeadLine());
+        assertEquals(ProjektTyp.STRATEGISCHES_PROJEKT, projekt.getTyp());
+    }
+
+    @Test
+    public void readAllFiles() throws Exception {
+
+        assertNotNull(readExcel("/lv-projekte.xlsx"));
+        assertNotNull(readExcel("/001 One-team-one-mhproject_v3.xlsx"));
+        assertNotNull(readExcel("/002 One-team-one-mhproject-with-overflow.xlsx"));
+        assertNotNull(readExcel("/003 One-team-one-pproject.xlsx"));
+        assertNotNull(readExcel("/003b One-team-one-pproject-restriction-changed.xlsx"));
+        assertNotNull(readExcel("/004 One-team-one-pproject-with-overflow.xlsx"));
+        assertNotNull(readExcel("/005 One-team-two-mhprojects-with-overflow.xlsx"));
+        assertNotNull(readExcel("/006 Two-teams-one-mhproject-with-overflow.xlsx"));
+        assertNotNull(readExcel("/007 One-team-one-strategic-project.xlsx"));
+        assertNotNull(readExcel("/008 One-team-one-mh-one-strategic-project.xlsx"));
+    }
+
+    private ProjektPortfolio readExcel(String path) throws Exception {
+        Path resPath = Paths.get(getClass().getResource(path).toURI());
+        return reader.read(new XSSFWorkbook(Files.newInputStream(resPath)));
     }
 
     private Optional<ProjektAufwand> getProjektAufwand(final String projektName) {
