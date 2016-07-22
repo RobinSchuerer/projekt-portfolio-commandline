@@ -60,16 +60,23 @@ public class ProjektPortfolioExcelReader {
         return entry -> {
             Projekt projekt = entry.getKey();
 
-            Map<Team, BigDecimal> aufwaende = teams.entrySet().stream().collect(Collectors.toMap(t -> t.getKey(), newValueMapper(sheet, entry)));
+            Map<Team, BigDecimal> aufwaende = teams
+                    .entrySet()
+                    .stream()
+                    .collect(Collectors.toMap(teamEntry -> teamEntry.getKey(), newValueMapper(sheet, entry.getValue())));
 
             return ProjektAufwand.newBuilder().withProjekt(projekt).withAufwaende(aufwaende).build();
 
         };
     }
 
-    private Function<Map.Entry<Team, Integer>, BigDecimal> newValueMapper(XSSFSheet sheet, Map.Entry<Projekt, Integer> projektMap) {
+    private Function<Map.Entry<Team, Integer>, BigDecimal> newValueMapper(XSSFSheet sheet, int projektSpalte) {
         return entry -> {
-            double aufwand = sheet.getRow(entry.getValue()).getCell(projektMap.getValue()).getNumericCellValue();
+            double aufwand = sheet
+                    .getRow(entry.getValue())
+                    .getCell(projektSpalte)
+                    .getNumericCellValue();
+
             return new BigDecimal(aufwand);
         };
     }
