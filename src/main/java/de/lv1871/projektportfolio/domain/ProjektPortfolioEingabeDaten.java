@@ -1,6 +1,9 @@
 package de.lv1871.projektportfolio.domain;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -40,6 +43,31 @@ public class ProjektPortfolioEingabeDaten {
 
     public List<ProjektAufwand> getProjektAufwaende() {
         return projektAufwaende;
+    }
+
+    public BigDecimal getKapazitaet(Team team, LocalDate monat, ProjektTyp projektTyp) {
+        TeamKapazitaet kapazitaet = teamKapazitaeten
+                .stream()
+                .filter(tk -> tk.getTeam().equals(team))
+                .filter(tk -> tk.getMonat().equals(monat))
+                .findFirst()
+                .get();
+
+        BigDecimal faktor = getFaktor(projektTyp);
+
+        return faktor.multiply(kapazitaet);
+
+    }
+
+    private BigDecimal getFaktor(ProjektTyp projektTyp) {
+
+        Optional<Beschraenkung> beschraenkung = beschraenkungen.stream().filter(b -> b.getTyp() == projektTyp).findFirst();
+
+        if(!beschraenkung.isPresent()){
+            return BigDecimal.ONE;
+        }
+
+        return beschraenkung.get().getValue();
     }
 
     public static final class Builder {
