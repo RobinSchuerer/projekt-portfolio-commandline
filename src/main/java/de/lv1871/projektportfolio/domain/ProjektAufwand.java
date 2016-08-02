@@ -5,9 +5,6 @@ import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by SchuererR on 16.06.2016.
- */
 public class ProjektAufwand {
 
     private Projekt projekt;
@@ -26,7 +23,7 @@ public class ProjektAufwand {
         return projekt;
     }
 
-    public void setProjekt(Projekt projekt) {
+    private void setProjekt(Projekt projekt) {
         this.projekt = projekt;
     }
 
@@ -34,7 +31,7 @@ public class ProjektAufwand {
         return aufwaende;
     }
 
-    public void setAufwaende(Map<Team, BigDecimal> aufwaende) {
+    private void setAufwaende(Map<Team, BigDecimal> aufwaende) {
         this.aufwaende = aufwaende;
     }
 

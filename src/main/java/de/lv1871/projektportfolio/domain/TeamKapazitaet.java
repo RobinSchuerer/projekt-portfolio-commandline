@@ -5,9 +5,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 
-/**
- * Created by SchuererR on 16.06.2016.
- */
 public class TeamKapazitaet {
 
     private LocalDate monat;
@@ -28,7 +25,7 @@ public class TeamKapazitaet {
         return monat;
     }
 
-    public void setMonat(LocalDate monat) {
+    private void setMonat(LocalDate monat) {
         this.monat = monat;
     }
 
@@ -36,15 +33,15 @@ public class TeamKapazitaet {
         return team;
     }
 
-    public void setTeam(Team team) {
+    private void setTeam(Team team) {
         this.team = team;
     }
 
-    public BigDecimal getKapazitaet() {
+    private BigDecimal getKapazitaet() {
         return kapazitaet.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 
-    public void setKapazitaet(BigDecimal kapazitaet) {
+    private void setKapazitaet(BigDecimal kapazitaet) {
         this.kapazitaet = kapazitaet;
     }
 

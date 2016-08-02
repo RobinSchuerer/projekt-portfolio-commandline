@@ -2,9 +2,6 @@ package de.lv1871.projektportfolio.domain;
 
 import java.time.LocalDate;
 
-/**
- * Created by SchuererR on 16.06.2016.
- */
 public class Projekt {
 
     private String name;
@@ -27,7 +24,7 @@ public class Projekt {
         return name;
     }
 
-    public void setName(String name) {
+    private void setName(String name) {
         this.name = name;
     }
 
@@ -35,7 +32,7 @@ public class Projekt {
         return typ;
     }
 
-    public void setTyp(ProjektTyp typ) {
+    private void setTyp(ProjektTyp typ) {
         this.typ = typ;
     }
 
@@ -43,7 +40,7 @@ public class Projekt {
         return prioritaet;
     }
 
-    public void setPrioritaet(int prioritaet) {
+    private void setPrioritaet(int prioritaet) {
         this.prioritaet = prioritaet;
     }
 
@@ -51,7 +48,7 @@ public class Projekt {
         return deadLine;
     }
 
-    public void setDeadLine(LocalDate deadLine) {
+    private void setDeadLine(LocalDate deadLine) {
         this.deadLine = deadLine;
     }
 

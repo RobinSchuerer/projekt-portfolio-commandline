@@ -2,9 +2,6 @@ package de.lv1871.projektportfolio.domain;
 
 import java.math.BigDecimal;
 
-/**
- * Created by SchuererR on 16.06.2016.
- */
 public class Beschraenkung {
 
     private BigDecimal value = new BigDecimal("100.00");
@@ -27,7 +24,7 @@ public class Beschraenkung {
         return value.setScale(2,BigDecimal.ROUND_HALF_UP);
     }
 
-    public void setValue(BigDecimal value) {
+    private void setValue(BigDecimal value) {
         this.value = value;
     }
 
@@ -35,7 +32,7 @@ public class Beschraenkung {
         return typ;
     }
 
-    public void setTyp(ProjektTyp typ) {
+    private void setTyp(ProjektTyp typ) {
         this.typ = typ;
     }
 

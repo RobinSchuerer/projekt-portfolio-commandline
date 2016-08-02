@@ -4,9 +4,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-/**
- * Created by SchuererR on 16.06.2016.
- */
 public class ProjektPortfolio {
 
     private final String name;
@@ -34,7 +31,7 @@ public class ProjektPortfolio {
     }
 
     public Set<Team> getTeams(){
-        return teamKapazitaeten.stream().map(k->k.getTeam()).collect(Collectors.toSet());
+        return teamKapazitaeten.stream().map(TeamKapazitaet::getTeam).collect(Collectors.toSet());
     }
 
     public List<TeamKapazitaet> getTeamKapazitaeten() {
