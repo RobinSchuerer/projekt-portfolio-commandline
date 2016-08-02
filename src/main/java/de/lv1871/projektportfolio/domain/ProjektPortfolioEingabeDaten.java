@@ -4,14 +4,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class ProjektPortfolio {
+public class ProjektPortfolioEingabeDaten {
 
     private final String name;
     private final List<Beschraenkung> beschraenkungen;
     private final List<TeamKapazitaet> teamKapazitaeten;
     private final List<ProjektAufwand> projektAufwaende;
 
-    private ProjektPortfolio(Builder builder) {
+    private ProjektPortfolioEingabeDaten(Builder builder) {
         name = builder.name;
         beschraenkungen = builder.beschraenkungen;
         teamKapazitaeten = builder.teamKapazitaeten;
@@ -79,8 +79,8 @@ public class ProjektPortfolio {
             return this;
         }
 
-        public ProjektPortfolio build() {
-            return new ProjektPortfolio(this);
+        public ProjektPortfolioEingabeDaten build() {
+            return new ProjektPortfolioEingabeDaten(this);
         }
     }
 }

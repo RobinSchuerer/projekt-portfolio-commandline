@@ -23,7 +23,7 @@ public class ExcelImportTest {
 
     private final ProjektPortfolioExcelReader reader = new ProjektPortfolioExcelReader();
     private XSSFWorkbook workbook;
-    private ProjektPortfolio portfolio;
+    private ProjektPortfolioEingabeDaten portfolio;
 
     @Before
     public void setUp() throws Exception {
@@ -259,7 +259,7 @@ public class ExcelImportTest {
         assertNotNull(readExcel("/016_1T_Team1_1MHP_Project3.xlsx"));
     }
 
-    private ProjektPortfolio readExcel(String path) throws Exception {
+    private ProjektPortfolioEingabeDaten readExcel(String path) throws Exception {
         Path resPath = Paths.get(getClass().getResource(path).toURI());
         return reader.read(new XSSFWorkbook(Files.newInputStream(resPath)));
     }

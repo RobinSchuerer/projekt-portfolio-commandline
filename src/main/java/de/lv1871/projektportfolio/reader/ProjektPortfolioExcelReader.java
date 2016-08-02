@@ -22,12 +22,12 @@ import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
 
 class ProjektPortfolioExcelReader {
 
-    public ProjektPortfolio read(XSSFWorkbook workbook) {
+    public ProjektPortfolioEingabeDaten read(XSSFWorkbook workbook) {
         XSSFSheet sheet = workbook.getSheetAt(0);
 
         String portfolioName = getPortfolioName(sheet);
 
-        return ProjektPortfolio
+        return ProjektPortfolioEingabeDaten
                 .newBuilder()
                 .withName(portfolioName)
                 .withTeamKapazitaeten(readTeamKapazitaeten(sheet))
