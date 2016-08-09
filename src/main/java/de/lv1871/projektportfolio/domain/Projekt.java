@@ -84,5 +84,16 @@ public class Projekt {
         public Projekt build() {
             return new Projekt(this);
         }
+
+    }
+
+    @Override
+    public String toString() {
+        return "Projekt{" +
+                "name='" + name + '\'' +
+                ", typ=" + typ +
+                ", prioritaet=" + prioritaet +
+                ", deadLine=" + deadLine +
+                '}';
     }
 }

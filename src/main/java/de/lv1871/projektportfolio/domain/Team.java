@@ -51,4 +51,9 @@ public class Team {
             return new Team(this);
         }
     }
+
+    @Override
+    public String toString() {
+        return name ;
+    }
 }

@@ -5,6 +5,7 @@ import com.google.common.collect.Lists;
 import de.lv1871.projektportfolio.domain.*;
 import org.junit.Test;
 
+import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
@@ -38,12 +39,12 @@ public class ServiceTest {
                 .withProjektAufwaende(Lists.newArrayList(
                         ProjektAufwand
                                 .newBuilder()
-                                .withProjekt(Projekt.newBuilder().withName("Projekt A").build())
+                                .withProjekt(newProjekt("Projekt A",ProjektTyp.MUSS_PROJEKT))
                                 .withAufwaende(ImmutableMap.of(team,new BigDecimal("12")))
                                 .build(),
                         ProjektAufwand
                                 .newBuilder()
-                                .withProjekt(Projekt.newBuilder().withName("Projekt B").build())
+                                .withProjekt(newProjekt("Projekt B",ProjektTyp.MUSS_PROJEKT))
                                 .withAufwaende(ImmutableMap.of(team,new BigDecimal("8")))
                                 .build()
                         ))
@@ -53,5 +54,11 @@ public class ServiceTest {
 
         assertEquals(1, vorschlag.getAufwandVerteilungen().size());
 
+    }
+
+    private Projekt newProjekt(@Nonnull String name,
+                               @Nonnull ProjektTyp typ) {
+
+        return Projekt.newBuilder().withName(name).withTyp(typ).build();
     }
 }

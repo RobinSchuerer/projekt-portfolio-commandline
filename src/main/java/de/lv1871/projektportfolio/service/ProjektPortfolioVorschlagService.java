@@ -1,5 +1,6 @@
 package de.lv1871.projektportfolio.service;
 
+import com.google.common.collect.ComparisonChain;
 import de.lv1871.projektportfolio.domain.*;
 
 import javax.annotation.Nonnull;
@@ -18,7 +19,10 @@ public class ProjektPortfolioVorschlagService {
     private static final Predicate<ProjektAufwand> MUSSPROJEKTE_FILTER =
             pa -> pa.getTyp() == ProjektTyp.MUSS_PROJEKT;
     private static final Comparator<ProjektAufwand> SORTIERT_NACH_DEADLINE =
-            (pa1, pa2) -> pa1.getDeadLine().compareTo(pa2.getDeadLine());
+            (pa1, pa2) -> ComparisonChain
+                    .start()
+                    .compare(pa1.getDeadLine(), pa2.getDeadLine(), Comparator.nullsFirst())
+                    .result();
 
     @Nonnull
     public ProjektPortfolioVorschlag berechne(@Nonnull ProjektPortfolioEingabeDaten portfolio) {

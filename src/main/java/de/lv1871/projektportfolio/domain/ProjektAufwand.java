@@ -70,5 +70,13 @@ public class ProjektAufwand {
     public LocalDate getDeadLine(){
         return getProjekt().getDeadLine();
     }
+
+    @Override
+    public String toString() {
+        return "ProjektAufwand{" +
+                "projekt=" + projekt +
+                ", aufwaende=" + aufwaende +
+                '}';
+    }
 }
 
