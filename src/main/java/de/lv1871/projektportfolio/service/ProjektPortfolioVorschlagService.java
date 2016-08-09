@@ -65,6 +65,10 @@ public class ProjektPortfolioVorschlagService {
 
         // für jeden monat
         for (int i = 0; i < Integer.MAX_VALUE; i++) {
+            if(nichtsZuTun(todoMap)){
+                break;
+            }
+
             aktuellerMonat = aktuellerMonat.minusMonths(i);
 
             // Gesamtaufwand für diesen Monat
@@ -72,22 +76,32 @@ public class ProjektPortfolioVorschlagService {
 
             // welche Projekte müssen in diesem Monat bearbeitet werden
             List<Projekt> relevanteProjekte = getRelevanteProjekte(mussProjekte,aktuellerMonat, todoMap,team);
-            for (int i1 = 0; i1 < mussProjekte.size(); i1++) {
+            for (int i1 = 0; i1 < relevanteProjekte.size(); i1++) {
 
-                ProjektAufwand projektAufwand = mussProjekte.get(i1);
+                Projekt projekt = relevanteProjekte.get(i1);
+
                 BigDecimal anzahl = new BigDecimal(mussProjekte.size() - i1);
                 BigDecimal proProjekt = gesamt.divide(anzahl, MathContext.DECIMAL32);
 
-                BigDecimal todo = todoMap.get(projektAufwand.getProjekt());
+
+                BigDecimal todo = todoMap.get(projekt);
                 BigDecimal monatsWert = proProjekt.min(todo);
 
-                todoMap.put(projektAufwand.getProjekt(),todo.subtract(monatsWert));
+                gesamt = gesamt.subtract(monatsWert);
+                BigDecimal rest = todo.subtract(monatsWert);
 
-                System.out.println(projektAufwand + " " + aktuellerMonat + " " + monatsWert);
+                todoMap.put(projekt, rest);
+
+                System.out.println(projekt.getName() + " " + aktuellerMonat + " " + monatsWert);
             }
 
         }
 
+    }
+
+    private boolean nichtsZuTun(Map<Projekt, BigDecimal> todoMap) {
+
+        return todoMap.values().stream().reduce(BigDecimal::add).get().doubleValue() <= 0;
     }
 
     private List<Projekt> getRelevanteProjekte(@Nonnull List<ProjektAufwand> mussProjekte,
@@ -99,8 +113,8 @@ public class ProjektPortfolioVorschlagService {
                 .stream()
                 .filter(projektAufwand -> !aktuellerMonat.isAfter(projektAufwand.getDeadLine()))
                 .filter(projektAufwand -> todoMap.get(projektAufwand.getProjekt()).doubleValue() > 0)
-                .sorted((o1, o2) -> o1.getAufwand(team).compareTo(o2.getAufwand(team)))
                 .map(ProjektAufwand::getProjekt)
+                .sorted((o1, o2) -> todoMap.get(o1).compareTo(todoMap.get(o2)))
                 .collect(Collectors.toList());
 
         return relevanteProjekte;
