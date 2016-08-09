@@ -1,6 +1,7 @@
 package de.lv1871.projektportfolio.service;
 
 import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Ordering;
 import de.lv1871.projektportfolio.domain.*;
 
 import javax.annotation.Nonnull;
@@ -21,7 +22,7 @@ public class ProjektPortfolioVorschlagService {
     private static final Comparator<ProjektAufwand> SORTIERT_NACH_DEADLINE =
             (pa1, pa2) -> ComparisonChain
                     .start()
-                    .compare(pa1.getDeadLine(), pa2.getDeadLine(), Comparator.nullsFirst())
+                    .compare(pa1.getDeadLine(), pa2.getDeadLine(), Ordering.natural().nullsFirst())
                     .result();
 
     @Nonnull
@@ -77,7 +78,7 @@ public class ProjektPortfolioVorschlagService {
                 BigDecimal anzahl = new BigDecimal(mussProjekte.size() - i1);
                 BigDecimal proProjekt = gesamt.divide(anzahl, MathContext.DECIMAL32);
 
-                BigDecimal todo = todoMap.get(projektAufwand);
+                BigDecimal todo = todoMap.get(projektAufwand.getProjekt());
                 BigDecimal monatsWert = proProjekt.min(todo);
 
                 todoMap.put(projektAufwand.getProjekt(),todo.subtract(monatsWert));

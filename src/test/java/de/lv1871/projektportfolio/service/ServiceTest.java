@@ -59,6 +59,6 @@ public class ServiceTest {
     private Projekt newProjekt(@Nonnull String name,
                                @Nonnull ProjektTyp typ) {
 
-        return Projekt.newBuilder().withName(name).withTyp(typ).build();
+        return Projekt.newBuilder().withName(name).withTyp(typ).withDeadLine(LocalDate.parse("2016-02-01")).build();
     }
 }

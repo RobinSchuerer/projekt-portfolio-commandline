@@ -96,4 +96,20 @@ public class Projekt {
                 ", deadLine=" + deadLine +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Projekt projekt = (Projekt) o;
+
+        return name.equals(projekt.name);
+
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
+    }
 }

@@ -61,6 +61,10 @@ public class ProjektPortfolioEingabeDaten {
 
     private BigDecimal getFaktor(ProjektTyp projektTyp) {
 
+        if (beschraenkungen == null) {
+            return BigDecimal.ONE;
+        }
+
         Optional<Beschraenkung> beschraenkung = beschraenkungen.stream().filter(b -> b.getTyp() == projektTyp).findFirst();
 
         if(!beschraenkung.isPresent()){
