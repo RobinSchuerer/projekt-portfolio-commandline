@@ -1,5 +1,7 @@
 package de.lv1871.projektportfolio.domain;
 
+import com.google.common.collect.Lists;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -76,9 +78,9 @@ public class ProjektPortfolioEingabeDaten {
 
     public static final class Builder {
         private String name;
-        private List<Beschraenkung> beschraenkungen;
-        private List<TeamKapazitaet> teamKapazitaeten;
-        private List<ProjektAufwand> projektAufwaende;
+        private List<Beschraenkung> beschraenkungen = Lists.newArrayList();
+        private List<TeamKapazitaet> teamKapazitaeten = Lists.newArrayList();
+        private List<ProjektAufwand> projektAufwaende = Lists.newArrayList();
 
         private Builder() {
         }
