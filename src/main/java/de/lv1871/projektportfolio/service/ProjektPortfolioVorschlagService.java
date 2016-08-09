@@ -44,15 +44,17 @@ public class ProjektPortfolioVorschlagService {
                     .collect(Collectors.toList());
 
             if (!mussProjekte.isEmpty()) {
-                verarbeiteMussProjekte(portfolio, team, mussProjekte);
+                return verarbeiteMussProjekte(portfolio, team, mussProjekte);
             }
         }
         return ProjektPortfolioVorschlag.newBuilder().build();
     }
 
-    private void verarbeiteMussProjekte(@Nonnull ProjektPortfolioEingabeDaten portfolioEingabeDaten,
+    private ProjektPortfolioVorschlag verarbeiteMussProjekte(@Nonnull ProjektPortfolioEingabeDaten portfolioEingabeDaten,
                                         @Nonnull Team team,
                                         @Nonnull List<ProjektAufwand> mussProjekte) {
+
+        ProjektPortfolioVorschlag result = ProjektPortfolioVorschlag.newBuilder().build();
 
         // letzte Deadline von hier wird rückwärts aufgeteilt
         LocalDate aktuellerMonat = mussProjekte.stream().findFirst().get().getProjekt().getDeadLine();
@@ -83,7 +85,6 @@ public class ProjektPortfolioVorschlagService {
                 BigDecimal anzahl = new BigDecimal(mussProjekte.size() - i1);
                 BigDecimal proProjekt = gesamt.divide(anzahl, MathContext.DECIMAL32);
 
-
                 BigDecimal todo = todoMap.get(projekt);
                 BigDecimal monatsWert = proProjekt.min(todo);
 
@@ -92,11 +93,11 @@ public class ProjektPortfolioVorschlagService {
 
                 todoMap.put(projekt, rest);
 
-                System.out.println(projekt.getName() + " " + aktuellerMonat + " " + monatsWert);
+                result.add(team, projekt,aktuellerMonat,monatsWert);
             }
-
         }
 
+        return result;
     }
 
     private boolean nichtsZuTun(Map<Projekt, BigDecimal> todoMap) {

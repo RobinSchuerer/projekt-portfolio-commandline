@@ -52,7 +52,11 @@ public class ServiceTest {
 
         ProjektPortfolioVorschlag vorschlag = service.berechne(test);
 
-        assertEquals(1, vorschlag.getAufwandVerteilungen().size());
+        assertEquals(2, vorschlag.getAufwandVerteilungen().size());
+        assertEquals(new BigDecimal("5.00"), vorschlag.getAufwand("team1", "Projekt A", LocalDate.parse("2016-02-01")).get());
+        assertEquals(new BigDecimal("5.00"), vorschlag.getAufwand("team1", "Projekt B", LocalDate.parse("2016-02-01")).get());
+        assertEquals(new BigDecimal("3.00"), vorschlag.getAufwand("team1", "Projekt B", LocalDate.parse("2016-01-01")).get());
+        assertEquals(new BigDecimal("7.00"), vorschlag.getAufwand("team1", "Projekt A", LocalDate.parse("2016-01-01")).get());
 
     }
 
