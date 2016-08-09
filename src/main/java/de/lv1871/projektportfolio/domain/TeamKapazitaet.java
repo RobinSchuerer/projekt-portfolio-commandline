@@ -37,7 +37,7 @@ public class TeamKapazitaet {
         this.team = team;
     }
 
-    private BigDecimal getKapazitaet() {
+    public BigDecimal getKapazitaet() {
         return kapazitaet.setScale(2, BigDecimal.ROUND_HALF_UP);
     }
 

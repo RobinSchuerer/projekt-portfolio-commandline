@@ -2,6 +2,7 @@ package de.lv1871.projektportfolio.domain;
 
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -35,6 +36,14 @@ public class ProjektAufwand {
         this.aufwaende = aufwaende;
     }
 
+    public BigDecimal getAufwand(Team team) {
+        return aufwaende.get(team);
+    }
+
+    public ProjektTyp getTyp() {
+        return getProjekt().getTyp();
+    }
+
 
     public static final class Builder {
         private Projekt projekt;
@@ -57,4 +66,9 @@ public class ProjektAufwand {
             return new ProjektAufwand(this);
         }
     }
+
+    public LocalDate getDeadLine(){
+        return getProjekt().getDeadLine();
+    }
 }
+

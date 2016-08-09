@@ -55,7 +55,7 @@ public class ProjektPortfolioEingabeDaten {
 
         BigDecimal faktor = getFaktor(projektTyp);
 
-        return faktor.multiply(kapazitaet);
+        return faktor.multiply(kapazitaet.getKapazitaet());
 
     }
 
