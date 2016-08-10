@@ -248,7 +248,6 @@ public class ExcelImportTest {
         assertNotNull(readExcel("/006 Two-teams-one-mhproject-with-overflow.xlsx"));
         assertNotNull(readExcel("/007 One-team-one-strategic-project.xlsx"));
         assertNotNull(readExcel("/008 One-team-one-mh-one-strategic-project.xlsx"));
-        assertNotNull(readExcel("/009 Two-teams-two-mh-one-strategic-project_b.xlsx"));
         assertNotNull(readExcel("/010 One-team-two-sprojects.xlsx"));
         assertNotNull(readExcel("/011 Many-teams-many-projects.xlsx"));
         assertNotNull(readExcel("/012 Many-teams-many-projects Portfolio LV1871_1.xlsx"));

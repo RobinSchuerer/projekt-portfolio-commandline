@@ -7,3 +7,7 @@ ProjektPortfolio.ipr
 out/
 src/test/resources/009 Two-teams-two-mh-one-strategic-project_b.xlsx
 src/test/resources/Video.txt
+gradle
+gradlew
+gradlew.bat
+*.iml
