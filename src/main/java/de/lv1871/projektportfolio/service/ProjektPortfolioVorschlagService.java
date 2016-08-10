@@ -75,8 +75,8 @@ public class ProjektPortfolioVorschlagService {
                     .getKapazitaet(team, aktuellerMonat, ProjektTyp.MUSS_PROJEKT);
 
             if (!gesamtOptional.isPresent()) {
-                // TODO: RS overflow
-                System.out.println("overflow");
+                // overflow
+                todoMap.entrySet().forEach(e -> result.addUeberlauf(team, e.getKey(),e.getValue()));
                 break;
             }
 

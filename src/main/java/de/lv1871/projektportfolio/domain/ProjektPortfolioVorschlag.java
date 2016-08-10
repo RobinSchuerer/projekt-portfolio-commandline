@@ -1,6 +1,7 @@
 package de.lv1871.projektportfolio.domain;
 
 import com.google.common.collect.Lists;
+import de.ros.tagmap.TagMap;
 
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
@@ -12,6 +13,8 @@ import java.util.function.Predicate;
 public class ProjektPortfolioVorschlag {
 
     private final List<AufwandverteilungProTeamUndProjekt> aufwandVerteilungen;
+
+    private final TagMap<BigDecimal> ueberlauf = new TagMap<>();
 
     private ProjektPortfolioVorschlag(Builder builder) {
         aufwandVerteilungen = builder.aufwandVerteilungen;
@@ -84,6 +87,26 @@ public class ProjektPortfolioVorschlag {
                 .filter(aufwandProMonat -> aufwandProMonat.getMonat().equals(monat))
                 .map(AufwandProMonat::getAufwand)
                 .findAny();
+    }
+
+    @Nonnull
+    public Optional<BigDecimal> getUeberlauf(@Nonnull String teamName, @Nonnull  String projektName) {
+
+        List<BigDecimal> values = ueberlauf.getValues(
+                Team.newBuilder().withName(teamName).build(),
+                Projekt.newBuilder().withName(projektName).build());
+
+        if(values.isEmpty()){
+            return Optional.empty();
+        }
+
+        return Optional.of(values.get(0));
+    }
+
+    public ProjektPortfolioVorschlag addUeberlauf(Team team, Projekt projekt, BigDecimal value) {
+        this.ueberlauf.put(value.setScale(2),team,projekt);
+
+        return this;
     }
 
     public static final class Builder {
