@@ -2,6 +2,8 @@ package de.lv1871.projektportfolio.domain;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.util.Locale;
 
 /**
  * Created by SchuererR on 02.08.2016.
@@ -49,5 +51,10 @@ public class AufwandProMonat {
         public AufwandProMonat build() {
             return new AufwandProMonat(this);
         }
+    }
+
+    @Override
+    public String toString() {
+        return monat.format(DateTimeFormatter.ofPattern("MMM YY", Locale.GERMAN)) + " " + aufwand;
     }
 }

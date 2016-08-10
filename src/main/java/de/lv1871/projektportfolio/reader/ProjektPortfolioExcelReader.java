@@ -1,5 +1,6 @@
 package de.lv1871.projektportfolio.reader;
 
+import com.google.common.base.Preconditions;
 import de.lv1871.projektportfolio.domain.*;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.Row;
@@ -16,11 +17,9 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_BLANK;
-import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_NUMERIC;
-import static org.apache.poi.ss.usermodel.Cell.CELL_TYPE_STRING;
+import static org.apache.poi.ss.usermodel.Cell.*;
 
-class ProjektPortfolioExcelReader {
+public class ProjektPortfolioExcelReader {
 
     public ProjektPortfolioEingabeDaten read(XSSFWorkbook workbook) {
         XSSFSheet sheet = workbook.getSheetAt(0);
@@ -81,12 +80,19 @@ class ProjektPortfolioExcelReader {
     private Map<Team, Integer> getTeamMap(XSSFSheet sheet) {
         int indexEffortZeile = getIndexOfZeileStartingWithValue(sheet, "effort");
 
-
         Map<Team, Integer> result = new HashMap<>();
 
         for (int i = indexEffortZeile; i < Integer.MAX_VALUE; i++) {
             XSSFRow teamZeile = sheet.getRow(i);
-            XSSFCell teamCell = teamZeile.getCell(i);
+
+            // wenn eine Leerzeile kommt muss aufgehört werden
+            if (teamZeile == null) {
+                break;
+            }
+
+
+            // der Team-Name steht immer in Spalte 2 (index 1)
+            XSSFCell teamCell = teamZeile.getCell(1);
             if (teamCell == null || teamCell.getCellType() != CELL_TYPE_STRING) {
                 break;
             }
@@ -98,6 +104,7 @@ class ProjektPortfolioExcelReader {
             result.put(team, i);
         }
 
+        Preconditions.checkArgument(!result.isEmpty(),"Keine Teams gefunden.");
         return result;
     }
 

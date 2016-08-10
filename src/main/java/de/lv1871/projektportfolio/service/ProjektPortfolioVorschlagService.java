@@ -16,10 +16,10 @@ public class ProjektPortfolioVorschlagService {
 
     private static final Predicate<ProjektAufwand> MUSSPROJEKTE_FILTER =
             pa -> pa.getTyp() == ProjektTyp.MUSS_PROJEKT;
-    private static final Comparator<ProjektAufwand> SORTIERT_NACH_DEADLINE =
+    private static final Comparator<ProjektAufwand> SORTIERT_NACH_DEADLINE_ABSTEIGEND =
             (pa1, pa2) -> ComparisonChain
                     .start()
-                    .compare(pa1.getDeadLine(), pa2.getDeadLine(), Ordering.natural().nullsFirst())
+                    .compare(pa1.getDeadLine(), pa2.getDeadLine(), Ordering.natural().reverse().nullsFirst())
                     .result();
 
     @Nonnull
@@ -37,7 +37,7 @@ public class ProjektPortfolioVorschlagService {
             List<ProjektAufwand> mussProjekte = projektAufwaende
                     .stream()
                     .filter(MUSSPROJEKTE_FILTER)
-                    .sorted(SORTIERT_NACH_DEADLINE)
+                    .sorted(SORTIERT_NACH_DEADLINE_ABSTEIGEND)
                     .collect(Collectors.toList());
 
             if (!mussProjekte.isEmpty()) {
@@ -54,7 +54,7 @@ public class ProjektPortfolioVorschlagService {
         ProjektPortfolioVorschlag result = ProjektPortfolioVorschlag.newBuilder().build();
 
         // letzte Deadline von hier wird rückwärts aufgeteilt
-        LocalDate aktuellerMonat = mussProjekte.stream().findFirst().get().getProjekt().getDeadLine();
+        LocalDate deadLine = mussProjekte.stream().findFirst().get().getProjekt().getDeadLine();
 
         Map<Projekt, BigDecimal> todoMap = mussProjekte
                 .stream()
@@ -68,13 +68,14 @@ public class ProjektPortfolioVorschlagService {
                 break;
             }
 
-            aktuellerMonat = aktuellerMonat.minusMonths(i);
+            LocalDate aktuellerMonat = deadLine.minusMonths(i);
 
             // Gesamtaufwand für diesen Monat
             Optional<BigDecimal> gesamtOptional = portfolioEingabeDaten
                     .getKapazitaet(team, aktuellerMonat, ProjektTyp.MUSS_PROJEKT);
 
             if (!gesamtOptional.isPresent()) {
+                // TODO: RS overflow
                 System.out.println("overflow");
                 break;
             }
@@ -87,7 +88,7 @@ public class ProjektPortfolioVorschlagService {
 
                 Projekt projekt = relevanteProjekte.get(i1);
 
-                BigDecimal anzahl = new BigDecimal(mussProjekte.size() - i1);
+                BigDecimal anzahl = new BigDecimal(relevanteProjekte.size() - i1);
                 BigDecimal proProjekt = gesamt.divide(anzahl, MathContext.DECIMAL32);
 
                 BigDecimal todo = todoMap.get(projekt);
