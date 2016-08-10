@@ -112,6 +112,17 @@ public class ServiceTest {
         assertEquals(new BigDecimal("4.00"), getValue(vorschlag,"Team1", "Project1", "2016-09-01"));
         assertEquals(new BigDecimal("2.00"), getValue(vorschlag,"Team1", "Project1", "2016-08-01"));
         assertEquals(new BigDecimal("2.80"), getValue(vorschlag,"Team1", "Project1", "2016-07-01"));
+        assertEquals(new BigDecimal("4.00"), getValue(vorschlag,"Team1", "Project1", "2016-06-01"));
+        assertEquals(new BigDecimal("2.20"), getValue(vorschlag,"Team1", "Project1", "2016-05-01"));
+
+
+        assertEquals(new BigDecimal("4.00"), getValue(vorschlag,"Team1", "Project2", "2016-10-01"));
+        assertEquals(new BigDecimal("4.00"), getValue(vorschlag,"Team1", "Project2", "2016-09-01"));
+        assertEquals(new BigDecimal("2.00"), getValue(vorschlag,"Team1", "Project2", "2016-08-01"));
+        assertEquals(new BigDecimal("2.80"), getValue(vorschlag,"Team1", "Project2", "2016-07-01"));
+        assertEquals(new BigDecimal("4.00"), getValue(vorschlag,"Team1", "Project2", "2016-06-01"));
+        assertEquals(new BigDecimal("5.80"), getValue(vorschlag,"Team1", "Project2", "2016-05-01"));
+        assertEquals(new BigDecimal("8.00"), getValue(vorschlag,"Team1", "Project2", "2016-04-01"));
 
     }
 
