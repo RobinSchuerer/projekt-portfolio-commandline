@@ -8,10 +8,7 @@ import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.LocalDate;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -51,8 +48,8 @@ public class ProjektPortfolioVorschlagService {
     }
 
     private ProjektPortfolioVorschlag verarbeiteMussProjekte(@Nonnull ProjektPortfolioEingabeDaten portfolioEingabeDaten,
-                                        @Nonnull Team team,
-                                        @Nonnull List<ProjektAufwand> mussProjekte) {
+                                                             @Nonnull Team team,
+                                                             @Nonnull List<ProjektAufwand> mussProjekte) {
 
         ProjektPortfolioVorschlag result = ProjektPortfolioVorschlag.newBuilder().build();
 
@@ -67,17 +64,25 @@ public class ProjektPortfolioVorschlagService {
 
         // für jeden monat
         for (int i = 0; i < Integer.MAX_VALUE; i++) {
-            if(nichtsZuTun(todoMap)){
+            if (nichtsZuTun(todoMap)) {
                 break;
             }
 
             aktuellerMonat = aktuellerMonat.minusMonths(i);
 
             // Gesamtaufwand für diesen Monat
-            BigDecimal gesamt = portfolioEingabeDaten.getKapazitaet(team, aktuellerMonat, ProjektTyp.MUSS_PROJEKT);
+            Optional<BigDecimal> gesamtOptional = portfolioEingabeDaten
+                    .getKapazitaet(team, aktuellerMonat, ProjektTyp.MUSS_PROJEKT);
+
+            if (!gesamtOptional.isPresent()) {
+                System.out.println("overflow");
+                break;
+            }
+
+            BigDecimal gesamt = gesamtOptional.get();
 
             // welche Projekte müssen in diesem Monat bearbeitet werden
-            List<Projekt> relevanteProjekte = getRelevanteProjekte(mussProjekte,aktuellerMonat, todoMap,team);
+            List<Projekt> relevanteProjekte = getRelevanteProjekte(mussProjekte, aktuellerMonat, todoMap, team);
             for (int i1 = 0; i1 < relevanteProjekte.size(); i1++) {
 
                 Projekt projekt = relevanteProjekte.get(i1);
@@ -93,7 +98,7 @@ public class ProjektPortfolioVorschlagService {
 
                 todoMap.put(projekt, rest);
 
-                result.add(team, projekt,aktuellerMonat,monatsWert);
+                result.add(team, projekt, aktuellerMonat, monatsWert);
             }
         }
 

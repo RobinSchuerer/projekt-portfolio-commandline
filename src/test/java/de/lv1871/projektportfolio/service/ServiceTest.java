@@ -69,7 +69,6 @@ public class ServiceTest {
     }
 
     @Test
-    @Ignore("overflow impl")
     public void restriction() throws Exception {
         eingabeDaten.getBeschraenkungen().add(Beschraenkung
                 .newBuilder()

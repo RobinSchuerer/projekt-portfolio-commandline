@@ -47,17 +47,20 @@ public class ProjektPortfolioEingabeDaten {
         return projektAufwaende;
     }
 
-    public BigDecimal getKapazitaet(Team team, LocalDate monat, ProjektTyp projektTyp) {
-        TeamKapazitaet kapazitaet = teamKapazitaeten
+    public Optional<BigDecimal> getKapazitaet(Team team, LocalDate monat, ProjektTyp projektTyp) {
+        Optional<TeamKapazitaet> kapazitaetOptional = teamKapazitaeten
                 .stream()
                 .filter(tk -> tk.getTeam().equals(team))
                 .filter(tk -> tk.getMonat().equals(monat))
-                .findFirst()
-                .get();
+                .findFirst();
+
+        if (!kapazitaetOptional.isPresent()) {
+            return Optional.empty();
+        }
 
         BigDecimal faktor = getFaktor(projektTyp);
 
-        return faktor.multiply(kapazitaet.getKapazitaet());
+        return Optional.of(faktor.multiply(kapazitaetOptional.get().getKapazitaet()));
 
     }
 

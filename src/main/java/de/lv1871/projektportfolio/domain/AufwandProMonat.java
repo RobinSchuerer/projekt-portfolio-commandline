@@ -21,7 +21,7 @@ public class AufwandProMonat {
     }
 
     public BigDecimal getAufwand() {
-        return aufwand;
+        return aufwand.setScale(2);
     }
 
     public LocalDate getMonat() {
