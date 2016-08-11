@@ -17,7 +17,6 @@ import java.util.stream.Collectors;
  */
 public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
 
-
     @Nonnull
     @Override
     public ProjektPortfolioVorschlag verarbeite(@Nonnull ProjektPortfolioEingabeDaten portfolioEingabeDaten,
@@ -41,6 +40,7 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
         // für jeden monat
         for (int i = 0; i < Integer.MAX_VALUE; i++) {
             LocalDate aktuellerMonat = deadLine.minusMonths(i);
+
 
 
         }
