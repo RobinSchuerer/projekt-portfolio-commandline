@@ -1,5 +1,6 @@
 package de.lv1871.projektportfolio.domain;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import de.ros.tagmap.TagMap;
 
@@ -105,6 +106,15 @@ public class ProjektPortfolioVorschlag {
 
     public ProjektPortfolioVorschlag addUeberlauf(Team team, Projekt projekt, BigDecimal value) {
         this.ueberlauf.put(value.setScale(2),team,projekt);
+
+        return this;
+    }
+
+    public ProjektPortfolioVorschlag addTeamVorschlag(@Nonnull ProjektPortfolioVorschlag teamProjektVorschlag) {
+        Preconditions.checkNotNull(teamProjektVorschlag);
+
+        aufwandVerteilungen.addAll(teamProjektVorschlag.getAufwandVerteilungen());
+        ueberlauf.merge(teamProjektVorschlag.ueberlauf);
 
         return this;
     }

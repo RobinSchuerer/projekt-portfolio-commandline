@@ -1,12 +1,34 @@
 package de.lv1871.projektportfolio.domain;
 
 
+import com.google.common.base.Preconditions;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Ordering;
+
+import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
 
 public class ProjektAufwand {
+
+    public static final Predicate<ProjektAufwand> MUSS_PROJEKT_FILTER =
+            projektTypFilter(ProjektTyp.MUSS_PROJEKT);
+
+    public static final Predicate<ProjektAufwand> PRODUKT_PROJEKT_FILTER =
+            projektTypFilter(ProjektTyp.PRODUKT_PROJEKT);
+
+    public static final Predicate<ProjektAufwand> STRATEGISCHES_PROJEKT_FILTER =
+            projektTypFilter(ProjektTyp.STRATEGISCHES_PROJEKT);
+
+    public static final Comparator<ProjektAufwand> SORTIERT_NACH_DEADLINE_ABSTEIGEND =
+            (pa1, pa2) -> ComparisonChain
+                    .start()
+                    .compare(pa1.getDeadLine(), pa2.getDeadLine(), Ordering.natural().reverse().nullsFirst())
+                    .result();
 
     private Projekt projekt;
     private Map<Team, BigDecimal> aufwaende = new HashMap<>();
@@ -67,7 +89,7 @@ public class ProjektAufwand {
         }
     }
 
-    public LocalDate getDeadLine(){
+    public LocalDate getDeadLine() {
         return getProjekt().getDeadLine();
     }
 
@@ -78,5 +100,18 @@ public class ProjektAufwand {
                 ", aufwaende=" + aufwaende +
                 '}';
     }
+
+    public static Predicate<ProjektAufwand> teamFilter(@Nonnull Team team) {
+        Preconditions.checkNotNull(team);
+
+        return (projektAufwand) -> projektAufwand.getAufwaende().keySet().contains(team);
+    }
+
+    public static final Predicate<ProjektAufwand> projektTypFilter(@Nonnull ProjektTyp typ) {
+        Preconditions.checkNotNull(typ);
+
+        return projektAufwand -> projektAufwand.getTyp() == typ;
+    }
+
 }
 

@@ -1,6 +1,7 @@
 package de.ros.tagmap;
 
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 
@@ -42,6 +43,14 @@ public class TagMap<VALUE_TYPE> {
                 .filter(matchingTagsFilter(tag, tags))
                 .map(ValueWithTags::getValue)
                 .collect(Collectors.toList());
+    }
+
+    public TagMap<VALUE_TYPE> merge(@Nonnull TagMap<VALUE_TYPE> other){
+        Preconditions.checkNotNull(other);
+
+        this.taggedValues.addAll(other.taggedValues);
+
+        return this;
     }
 
     private Predicate<ValueWithTags<VALUE_TYPE>> matchingTagsFilter(@Nonnull Object tag, Object[] tags) {

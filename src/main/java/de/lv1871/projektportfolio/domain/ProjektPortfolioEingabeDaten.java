@@ -1,12 +1,16 @@
 package de.lv1871.projektportfolio.domain;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
+import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class ProjektPortfolioEingabeDaten {
@@ -35,7 +39,7 @@ public class ProjektPortfolioEingabeDaten {
         return beschraenkungen;
     }
 
-    public Set<Team> getTeams(){
+    public Set<Team> getTeams() {
         return teamKapazitaeten.stream().map(TeamKapazitaet::getTeam).collect(Collectors.toSet());
     }
 
@@ -72,7 +76,7 @@ public class ProjektPortfolioEingabeDaten {
 
         Optional<Beschraenkung> beschraenkung = beschraenkungen.stream().filter(b -> b.getTyp() == projektTyp).findFirst();
 
-        if(!beschraenkung.isPresent()){
+        if (!beschraenkung.isPresent()) {
             return BigDecimal.ONE;
         }
 
@@ -101,9 +105,9 @@ public class ProjektPortfolioEingabeDaten {
         public Builder withTeamKapazitaeten(List<TeamKapazitaet> val) {
             teamKapazitaeten = val.stream().sorted(
 
-                    (t1,t2)-> {
+                    (t1, t2) -> {
                         int nameComparison = t1.getTeam().getName().compareTo(t2.getTeam().getName());
-                        if(nameComparison == 0) return t1.getMonat().compareTo(t2.getMonat());
+                        if (nameComparison == 0) return t1.getMonat().compareTo(t2.getMonat());
 
                         return nameComparison;
 
@@ -119,5 +123,17 @@ public class ProjektPortfolioEingabeDaten {
         public ProjektPortfolioEingabeDaten build() {
             return new ProjektPortfolioEingabeDaten(this);
         }
+    }
+
+
+
+    @Nonnull
+    public List<ProjektAufwand> getProjektAufwaende(@Nonnull Predicate<? super ProjektAufwand> filter,
+                                                    @Nonnull Comparator<? super ProjektAufwand> sortierung) {
+        return projektAufwaende
+                .stream()
+                .filter(Preconditions.checkNotNull(filter))
+                .sorted(Preconditions.checkNotNull(sortierung))
+                .collect(Collectors.toList());
     }
 }

@@ -19,7 +19,12 @@ import static org.junit.Assert.assertEquals;
 
 public class ServiceTest {
 
-    private ProjektPortfolioVorschlagService service = new ProjektPortfolioVorschlagService();
+    private ProjektPortfolioVorschlagService service = ProjektPortfolioVorschlagService
+            .newBuilder()
+            .withPflichtProjektStrategy(new SimplePflichtProjektStrategy())
+            .withStrategischeProjekteStrategy((pflichtProjekteVorschlag, eingabeDaten1, team1) -> pflichtProjekteVorschlag)
+            .build();
+
     private Team team;
     private ProjektPortfolioEingabeDaten eingabeDaten;
 
