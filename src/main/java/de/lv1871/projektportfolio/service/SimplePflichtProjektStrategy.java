@@ -33,6 +33,8 @@ public class SimplePflichtProjektStrategy implements  PflichtProjektStrategy {
                 ProjektAufwand.SORTIERT_NACH_DEADLINE_ABSTEIGEND
         );
 
+        mussProjekte.addAll(produktProjekte);
+
         ProjektPortfolioVorschlag result = ProjektPortfolioVorschlag.newBuilder().build();
 
         // letzte Deadline von hier wird rückwärts aufgeteilt
