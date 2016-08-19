@@ -24,6 +24,8 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
 
     private final static Set<ProjektTyp> PFLICHT_PROJEKTE = ImmutableSet.of(MUSS_PROJEKT, PRODUKT_PROJEKT);
 
+    private final static SimplePflichtProjektStrategy SIMPLE_PFLICHT_PROJEKT_STRATEGY = new SimplePflichtProjektStrategy();
+
     @Nonnull
     @Override
     public ProjektPortfolioVorschlag verarbeite(@Nonnull ProjektPortfolioEingabeDaten portfolioEingabeDaten,
@@ -58,6 +60,17 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
             HashMap<Projekt, BigDecimal> gleichVerteilung =
                     gleichVerteilung(portfolioEingabeDaten, team, todoMap, aktuellerMonat, projekteFuerDiesenMonat);
 
+            Set<ProjektTyp> invalid = PFLICHT_PROJEKTE.stream()
+                    .filter(projektTyp -> check(gleichVerteilung, portfolioEingabeDaten, team, aktuellerMonat, projektTyp))
+                    .collect(Collectors.toSet());
+
+            if(invalid.isEmpty()){
+                toErgebnis(result, gleichVerteilung, team, aktuellerMonat);
+                updateTodoMap(todoMap, gleichVerteilung);
+                continue;
+            }
+
+
             PFLICHT_PROJEKTE.forEach(projektTyp -> {
                 // Testen ob Restrictions überschritten
                 boolean restriktionenEingehalten = check(gleichVerteilung,
@@ -68,12 +81,24 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
 
                 if (restriktionenEingehalten) {
                     // Übernahme der Gleichverteilung ins Ergebnis
-                    toErgebnis(result, gleichVerteilung, team, aktuellerMonat);
-                    updateTodoMap(todoMap, gleichVerteilung);
+
 
                 } else {
                     // neu Verteilung entsprechend der Restriktionen
-                    verteileNachRestriktion(portfolioEingabeDaten, team, aufwandByTyp, result, todoMap, aktuellerMonat, projektTyp);
+
+                    Optional<BigDecimal> kapazitaetDieserMonat =
+                            portfolioEingabeDaten.getKapazitaetMitBeschraenkung(team, aktuellerMonat, projektTyp);
+
+                    if (!kapazitaetDieserMonat.isPresent()) {
+                        return;
+                    }
+                    verteileNachRestriktion(portfolioEingabeDaten,
+                            team,
+                            aufwandByTyp,
+                            result,
+                            todoMap,
+                            aktuellerMonat,
+                            projektTyp);
                 }
 
             });
@@ -93,12 +118,7 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
 
         List<ProjektAufwand> aufwandList = aufwandByTyp.get(projektTyp);
 
-        Optional<BigDecimal> kapazitaetDieserMonat =
-                portfolioEingabeDaten.getKapazitaetMitBeschraenkung(team, aktuellerMonat, projektTyp);
 
-        if (!kapazitaetDieserMonat.isPresent()) {
-            return;
-        }
         BigDecimal gesamt = kapazitaetDieserMonat.get();
 
         BigDecimal anzahl = new BigDecimal(aufwandList.size());
