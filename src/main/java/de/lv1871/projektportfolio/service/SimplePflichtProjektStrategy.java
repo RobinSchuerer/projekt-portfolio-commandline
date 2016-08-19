@@ -56,7 +56,7 @@ public class SimplePflichtProjektStrategy implements  PflichtProjektStrategy {
 
             // Gesamtaufwand für diesen Monat
             Optional<BigDecimal> gesamtOptional = eingabeDaten
-                    .getKapazitaet(team, aktuellerMonat, ProjektTyp.MUSS_PROJEKT);
+                    .getKapazitaetMitBeschraenkung(team, aktuellerMonat, ProjektTyp.MUSS_PROJEKT);
 
             if (!gesamtOptional.isPresent()) {
                 // overflow

@@ -51,7 +51,7 @@ public class ProjektPortfolioEingabeDaten {
         return projektAufwaende;
     }
 
-    public Optional<BigDecimal> getKapazitaet(Team team, LocalDate monat, ProjektTyp projektTyp) {
+    public Optional<BigDecimal> getKapazitaetMitBeschraenkung(Team team, LocalDate monat, ProjektTyp projektTyp) {
         Optional<TeamKapazitaet> kapazitaetOptional = teamKapazitaeten
                 .stream()
                 .filter(tk -> tk.getTeam().equals(team))
@@ -81,6 +81,23 @@ public class ProjektPortfolioEingabeDaten {
         }
 
         return beschraenkung.get().getValue();
+    }
+
+    @Nonnull
+    public Optional<BigDecimal> getKapazitaetMitBeschraenkung(@Nonnull Team team, @Nonnull LocalDate aktuellerMonat) {
+        Preconditions.checkNotNull(team);
+        Preconditions.checkNotNull(aktuellerMonat);
+
+        Optional<TeamKapazitaet> kapazitaetOptional = teamKapazitaeten.stream()
+                .filter(TeamKapazitaet.filterTeam(team))
+                .filter(TeamKapazitaet.filterMonat(aktuellerMonat))
+                .findAny();
+
+        if(!kapazitaetOptional.isPresent()){
+            return Optional.empty();
+        }
+
+        return Optional.of(kapazitaetOptional.get().getKapazitaet());
     }
 
     public static final class Builder {
