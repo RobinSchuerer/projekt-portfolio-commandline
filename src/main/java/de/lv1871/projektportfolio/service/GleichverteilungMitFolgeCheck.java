@@ -59,7 +59,7 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
                 break;
             }
 
-            List<Projekt> projekteFuerDiesenMonat = getRelevanteProjekte(alleProjekte, aktuellerMonat, todoMap);
+            List<ProjektAufwand> projekteFuerDiesenMonat = getRelevanteProjekte(alleProjekte, aktuellerMonat, todoMap);
 
             // Gleichverteilung: jedes Projekt bekommt den gleichen Anteil
             HashMap<Projekt, BigDecimal> gleichVerteilung =
@@ -83,9 +83,13 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
 
                 BigDecimal monatsBudget = verteilungsMap.get(projektTyp);
 
+                Map<ProjektTyp, List<ProjektAufwand>> relevanteAufwaendeByTyp = projekteFuerDiesenMonat
+                        .stream()
+                        .collect(Collectors.groupingBy(pa -> pa.getProjekt().getTyp()));
+
                 verteileNachRestriktion(monatsBudget,
                         team,
-                        aufwandByTyp,
+                        relevanteAufwaendeByTyp,
                         result,
                         todoMap,
                         aktuellerMonat,
@@ -190,6 +194,10 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
 
 
         List<ProjektAufwand> aufwandList = aufwandByTyp.get(projektTyp);
+        if(aufwandList == null || aufwandList.isEmpty()){
+            return;
+        }
+
 
         int gesamtAnzahl = aufwandList.size();
         BigDecimal gesamt = BigDecimal.valueOf(monatsMax.doubleValue());
@@ -274,7 +282,7 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
                                                           @Nonnull Team team,
                                                           @Nonnull Map<Projekt, BigDecimal> todoMap,
                                                           @Nonnull LocalDate aktuellerMonat,
-                                                          @Nonnull List<Projekt> projekteFuerDiesenMonat) {
+                                                          @Nonnull List<ProjektAufwand> projekteFuerDiesenMonat) {
 
         if(projekteFuerDiesenMonat.isEmpty()){
             return Maps.newHashMap();
@@ -292,7 +300,7 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
         BigDecimal gesamt = kapazitaet.get();
 
         for (int i = 0; i < projekteFuerDiesenMonat.size(); i++) {
-            Projekt projekt = projekteFuerDiesenMonat.get(i);
+            Projekt projekt = projekteFuerDiesenMonat.get(i).getProjekt();
 
             BigDecimal anzahlProjekte = new BigDecimal(gesamtAnzahl - i);
 
@@ -346,16 +354,15 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
                 Ordering.allEqual());
     }
 
-    private List<Projekt> getRelevanteProjekte(@Nonnull List<ProjektAufwand> projekte,
+    private List<ProjektAufwand> getRelevanteProjekte(@Nonnull List<ProjektAufwand> projekte,
                                                @Nonnull LocalDate aktuellerMonat,
                                                @Nonnull Map<Projekt, BigDecimal> todoMap) {
 
-        List<Projekt> relevanteProjekte = projekte
+        List<ProjektAufwand> relevanteProjekte = projekte
                 .stream()
                 .filter(projektAufwand -> !aktuellerMonat.isAfter(projektAufwand.getDeadLine()))
                 .filter(projektAufwand -> todoMap.get(projektAufwand.getProjekt()).doubleValue() > 0)
-                .map(ProjektAufwand::getProjekt)
-                .sorted((o1, o2) -> todoMap.get(o1).compareTo(todoMap.get(o2)))
+                .sorted((o1, o2) -> todoMap.get(o1.getProjekt()).compareTo(todoMap.get(o2.getProjekt())))
                 .collect(Collectors.toList());
 
         return relevanteProjekte;

@@ -3,9 +3,14 @@ package de.lv1871.projektportfolio.service;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Lists;
 import de.lv1871.projektportfolio.domain.*;
+import de.lv1871.projektportfolio.reader.ProjektPortfolioExcelReader;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.Test;
 
 import java.math.BigDecimal;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDate;
 
 import static org.junit.Assert.assertEquals;
@@ -91,11 +96,11 @@ public class GleichverteilungMitFolgeCheckTest {
                 .build();
 
         ProjektPortfolioVorschlag result = toTest.verarbeite(eingabeDaten, TEAM);
-        assertEquals(new BigDecimal("7.00"), getValue(result, MUSS_PROJEKT.getName(), "2016-12-01"));
-        assertEquals(new BigDecimal("3.00"), getValue(result, PRODUKT_PROJEKT.getName(), "2016-12-01"));
+        assertEquals(new BigDecimal("7.00"), getValue(result, TEAM.getName(), MUSS_PROJEKT.getName(), "2016-12-01"));
+        assertEquals(new BigDecimal("3.00"), getValue(result, TEAM.getName(), PRODUKT_PROJEKT.getName(), "2016-12-01"));
 
-        assertEquals(new BigDecimal("3.00"), getValue(result, MUSS_PROJEKT.getName(), "2016-11-01"));
-        assertEquals(new BigDecimal("3.00"), getValue(result, PRODUKT_PROJEKT.getName(), "2016-11-01"));
+        assertEquals(new BigDecimal("3.00"), getValue(result, TEAM.getName(), MUSS_PROJEKT.getName(), "2016-11-01"));
+        assertEquals(new BigDecimal("3.00"), getValue(result, TEAM.getName(), PRODUKT_PROJEKT.getName(), "2016-11-01"));
 
     }
 
@@ -149,11 +154,11 @@ public class GleichverteilungMitFolgeCheckTest {
                 .build();
 
         ProjektPortfolioVorschlag result = toTest.verarbeite(eingabeDaten, TEAM);
-        assertEquals(new BigDecimal("5.00"), getValue(result, MUSS_PROJEKT.getName(), "2016-12-01"));
-        assertEquals(new BigDecimal("5.00"), getValue(result, PRODUKT_PROJEKT.getName(), "2016-12-01"));
+        assertEquals(new BigDecimal("5.00"), getValue(result, TEAM.getName(), MUSS_PROJEKT.getName(), "2016-12-01"));
+        assertEquals(new BigDecimal("5.00"), getValue(result, TEAM.getName(), PRODUKT_PROJEKT.getName(), "2016-12-01"));
 
-        assertEquals(new BigDecimal("5.00"), getValue(result, MUSS_PROJEKT.getName(), "2016-11-01"));
-        assertEquals(new BigDecimal("5.00"), getValue(result, PRODUKT_PROJEKT.getName(), "2016-11-01"));
+        assertEquals(new BigDecimal("5.00"), getValue(result, TEAM.getName(), MUSS_PROJEKT.getName(), "2016-11-01"));
+        assertEquals(new BigDecimal("5.00"), getValue(result, TEAM.getName(), PRODUKT_PROJEKT.getName(), "2016-11-01"));
 
 
     }
@@ -221,13 +226,13 @@ public class GleichverteilungMitFolgeCheckTest {
                 .build();
 
         ProjektPortfolioVorschlag result = toTest.verarbeite(eingabeDaten, TEAM);
-        assertEquals(new BigDecimal("2.25"), getValue(result, MUSS_PROJEKT.getName(), "2016-12-01"));
-        assertEquals(new BigDecimal("2.25"), getValue(result, MUSS_PROJEKT2.getName(), "2016-12-01"));
-        assertEquals(new BigDecimal("4.50"), getValue(result, PRODUKT_PROJEKT.getName(), "2016-12-01"));
+        assertEquals(new BigDecimal("2.25"), getValue(result, TEAM.getName(), MUSS_PROJEKT.getName(), "2016-12-01"));
+        assertEquals(new BigDecimal("2.25"), getValue(result, TEAM.getName(), MUSS_PROJEKT2.getName(), "2016-12-01"));
+        assertEquals(new BigDecimal("4.50"), getValue(result, TEAM.getName(), PRODUKT_PROJEKT.getName(), "2016-12-01"));
 
-        assertEquals(new BigDecimal("2.25"), getValue(result, MUSS_PROJEKT.getName(), "2016-11-01"));
-        assertEquals(new BigDecimal("2.25"), getValue(result, MUSS_PROJEKT2.getName(), "2016-11-01"));
-        assertEquals(new BigDecimal("4.50"), getValue(result, PRODUKT_PROJEKT.getName(), "2016-11-01"));
+        assertEquals(new BigDecimal("2.25"), getValue(result, TEAM.getName(), MUSS_PROJEKT.getName(), "2016-11-01"));
+        assertEquals(new BigDecimal("2.25"), getValue(result, TEAM.getName(), MUSS_PROJEKT2.getName(), "2016-11-01"));
+        assertEquals(new BigDecimal("4.50"), getValue(result, TEAM.getName(), PRODUKT_PROJEKT.getName(), "2016-11-01"));
 
     }
 
@@ -292,12 +297,49 @@ public class GleichverteilungMitFolgeCheckTest {
                 .build();
 
         ProjektPortfolioVorschlag result = toTest.verarbeite(eingabeDaten, TEAM);
-        assertEquals(new BigDecimal("4.00"), getValue(result, MUSS_PROJEKT.getName(), "2016-12-01"));
-        assertEquals(new BigDecimal("4.00"), getValue(result, MUSS_PROJEKT2.getName(), "2016-12-01"));
-        assertEquals(new BigDecimal("2.00"), getValue(result, PRODUKT_PROJEKT.getName(), "2016-12-01"));
+        assertEquals(new BigDecimal("4.00"), getValue(result, TEAM.getName(), MUSS_PROJEKT.getName(), "2016-12-01"));
+        assertEquals(new BigDecimal("4.00"), getValue(result, TEAM.getName(), MUSS_PROJEKT2.getName(), "2016-12-01"));
+        assertEquals(new BigDecimal("2.00"), getValue(result, TEAM.getName(), PRODUKT_PROJEKT.getName(), "2016-12-01"));
     }
 
-    private BigDecimal getValue(ProjektPortfolioVorschlag teamName, String produktName, String monatString) {
-        return teamName.getAufwand(TEAM.getName(), produktName, LocalDate.parse(monatString)).get();
+    @Test
+    public void zweiMussProjekteMitOverflow() throws Exception {
+        ProjektPortfolioExcelReader reader = new ProjektPortfolioExcelReader();
+        String path = "/005 One-team-two-mhprojects-with-overflow.xlsx";
+
+        Path resPath = Paths.get(getClass().getResource(path).toURI());
+        ProjektPortfolioEingabeDaten eingabeDaten = reader.read(new XSSFWorkbook(Files.newInputStream(resPath)));
+
+        ProjektPortfolioVorschlag vorschlag = toTest.verarbeite(eingabeDaten, Team.newBuilder().withName("Team1").build());
+
+        assertEquals(new BigDecimal("8.00"), getValue(vorschlag,"Team1", "Project1", "2016-12-01"));
+        assertEquals(new BigDecimal("8.00"), getValue(vorschlag,"Team1", "Project1", "2016-11-01"));
+        assertEquals(new BigDecimal("4.00"), getValue(vorschlag,"Team1", "Project1", "2016-10-01"));
+        assertEquals(new BigDecimal("4.00"), getValue(vorschlag,"Team1", "Project1", "2016-09-01"));
+        assertEquals(new BigDecimal("2.00"), getValue(vorschlag,"Team1", "Project1", "2016-08-01"));
+        assertEquals(new BigDecimal("2.80"), getValue(vorschlag,"Team1", "Project1", "2016-07-01"));
+        assertEquals(new BigDecimal("4.00"), getValue(vorschlag,"Team1", "Project1", "2016-06-01"));
+        assertEquals(new BigDecimal("2.20"), getValue(vorschlag,"Team1", "Project1", "2016-05-01"));
+
+
+        assertEquals(new BigDecimal("4.00"), getValue(vorschlag,"Team1", "Project2", "2016-10-01"));
+        assertEquals(new BigDecimal("4.00"), getValue(vorschlag,"Team1", "Project2", "2016-09-01"));
+        assertEquals(new BigDecimal("2.00"), getValue(vorschlag,"Team1", "Project2", "2016-08-01"));
+        assertEquals(new BigDecimal("2.80"), getValue(vorschlag,"Team1", "Project2", "2016-07-01"));
+        assertEquals(new BigDecimal("4.00"), getValue(vorschlag,"Team1", "Project2", "2016-06-01"));
+        assertEquals(new BigDecimal("5.80"), getValue(vorschlag,"Team1", "Project2", "2016-05-01"));
+        assertEquals(new BigDecimal("8.00"), getValue(vorschlag,"Team1", "Project2", "2016-04-01"));
+
+        assertEquals(new BigDecimal("0.00"), vorschlag.getUeberlauf("Team1","Project1").get());
+        assertEquals(new BigDecimal("9.40"), vorschlag.getUeberlauf("Team1","Project2").get());
+
+    }
+
+
+    private BigDecimal getValue(ProjektPortfolioVorschlag result,
+                                String teamName,
+                                String projektName,
+                                String monatString) {
+        return result.getAufwand(teamName, projektName, LocalDate.parse(monatString)).get();
     }
 }
