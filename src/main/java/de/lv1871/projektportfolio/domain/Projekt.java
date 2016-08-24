@@ -1,9 +1,12 @@
 package de.lv1871.projektportfolio.domain;
 
 import java.time.LocalDate;
+import java.util.function.Predicate;
 
 public class Projekt {
 
+    public static final Predicate<Projekt> MUSS_PROJEKT_FILTER = projekt -> projekt.getTyp() == ProjektTyp.MUSS_PROJEKT;
+    public static final Predicate<Projekt> PRODUKT_PROJEKT_FILTER = projekt -> projekt.getTyp() == ProjektTyp.PRODUKT_PROJEKT;
     private String name;
     private ProjektTyp typ;
     private int prioritaet;

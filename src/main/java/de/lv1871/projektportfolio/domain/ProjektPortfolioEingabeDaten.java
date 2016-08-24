@@ -2,6 +2,7 @@ package de.lv1871.projektportfolio.domain;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
@@ -51,7 +52,7 @@ public class ProjektPortfolioEingabeDaten {
         return projektAufwaende;
     }
 
-    public Optional<BigDecimal> getKapazitaetMitBeschraenkung(Team team, LocalDate monat, ProjektTyp projektTyp) {
+    public Optional<BigDecimal> getKapazitaet(Team team, LocalDate monat, ProjektTyp projektTyp) {
         Optional<TeamKapazitaet> kapazitaetOptional = teamKapazitaeten
                 .stream()
                 .filter(tk -> tk.getTeam().equals(team))
@@ -84,7 +85,7 @@ public class ProjektPortfolioEingabeDaten {
     }
 
     @Nonnull
-    public Optional<BigDecimal> getKapazitaetMitBeschraenkung(@Nonnull Team team, @Nonnull LocalDate aktuellerMonat) {
+    public Optional<BigDecimal> getKapazitaet(@Nonnull Team team, @Nonnull LocalDate aktuellerMonat) {
         Preconditions.checkNotNull(team);
         Preconditions.checkNotNull(aktuellerMonat);
 
@@ -98,6 +99,32 @@ public class ProjektPortfolioEingabeDaten {
         }
 
         return Optional.of(kapazitaetOptional.get().getKapazitaet());
+    }
+
+    @Nonnull
+    public Optional<BigDecimal> getBeschraenkung(@Nonnull ProjektTyp typ) {
+        Optional<Beschraenkung> first = beschraenkungen
+                .stream()
+                .filter(beschraenkung -> beschraenkung.getTyp() == typ).findFirst();
+
+
+        if (!first.isPresent()) {
+            return Optional.of(BigDecimal.ONE);
+        }
+
+        return Optional.of(first.get().getValue());
+    }
+
+    public boolean isAusserhalbZeitraum(@Nonnull LocalDate aktuellerMonat) {
+        Preconditions.checkNotNull(aktuellerMonat);
+
+        LocalDate fruehsterMonat = getTeamKapazitaeten()
+                .stream()
+                .map(teamKapazitaet -> teamKapazitaet.getMonat())
+                .min(Ordering.natural())
+                .get();
+
+        return aktuellerMonat.isBefore(fruehsterMonat);
     }
 
     public static final class Builder {

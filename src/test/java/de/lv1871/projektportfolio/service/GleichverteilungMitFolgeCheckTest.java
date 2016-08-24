@@ -8,6 +8,8 @@ import org.junit.Test;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+import static org.junit.Assert.assertEquals;
+
 public class GleichverteilungMitFolgeCheckTest {
 
     private static final Projekt MUSS_PROJEKT = Projekt
@@ -80,6 +82,16 @@ public class GleichverteilungMitFolgeCheckTest {
                 ))
                 .build();
 
+        ProjektPortfolioVorschlag result = toTest.verarbeite(eingabeDaten, TEAM);
+        assertEquals(new BigDecimal("7.00"), getValue(result, MUSS_PROJEKT.getName(), "2016-12-01"));
+        assertEquals(new BigDecimal("3.00"), getValue(result, PRODUKT_PROJEKT.getName(), "2016-12-01"));
 
+        assertEquals(new BigDecimal("3.00"), getValue(result, MUSS_PROJEKT.getName(), "2016-11-01"));
+        assertEquals(new BigDecimal("3.00"), getValue(result, PRODUKT_PROJEKT.getName(), "2016-11-01"));
+
+    }
+
+    private BigDecimal getValue(ProjektPortfolioVorschlag teamName, String produktName, String monatString) {
+        return teamName.getAufwand(TEAM.getName(), produktName, LocalDate.parse(monatString)).get();
     }
 }

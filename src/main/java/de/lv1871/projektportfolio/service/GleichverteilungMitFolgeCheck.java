@@ -54,6 +54,11 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
         for (int i = 0; i < Integer.MAX_VALUE; i++) {
             LocalDate aktuellerMonat = deadLine.minusMonths(i);
 
+            if(portfolioEingabeDaten.isAusserhalbZeitraum(aktuellerMonat)){
+                // TODO: 24.08.2016 overflow handling
+                break;
+            }
+
             List<Projekt> projekteFuerDiesenMonat = getRelevanteProjekte(alleProjekte, aktuellerMonat, todoMap);
 
             // Gleichverteilung: jedes Projekt bekommt den gleichen Anteil
@@ -61,45 +66,35 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
                     gleichVerteilung(portfolioEingabeDaten, team, todoMap, aktuellerMonat, projekteFuerDiesenMonat);
 
             Set<ProjektTyp> invalid = PFLICHT_PROJEKTE.stream()
-                    .filter(projektTyp -> check(gleichVerteilung, portfolioEingabeDaten, team, aktuellerMonat, projektTyp))
+                    .filter(projektTyp -> !check(gleichVerteilung, portfolioEingabeDaten, team, aktuellerMonat, projektTyp))
                     .collect(Collectors.toSet());
 
-            if(invalid.isEmpty()){
+            if (invalid.isEmpty()) {
                 toErgebnis(result, gleichVerteilung, team, aktuellerMonat);
                 updateTodoMap(todoMap, gleichVerteilung);
                 continue;
             }
 
+            // ermittle die Verteilung für den Fall "Restriktionen"
+            Map<ProjektTyp, BigDecimal> verteilungsMap = getVerteilungen(portfolioEingabeDaten,
+                    invalid, team, aktuellerMonat, aufwandByTyp);
 
             PFLICHT_PROJEKTE.forEach(projektTyp -> {
-                // Testen ob Restrictions überschritten
-                boolean restriktionenEingehalten = check(gleichVerteilung,
-                        portfolioEingabeDaten,
+
+                // neu Verteilung entsprechend der Restriktionen
+                Optional<BigDecimal> kapazitaetDieserMonat =
+                        portfolioEingabeDaten.getKapazitaet(team, aktuellerMonat, projektTyp);
+
+                if (!kapazitaetDieserMonat.isPresent()) {
+                    return;
+                }
+                verteileNachRestriktion(verteilungsMap.get(projektTyp),
                         team,
+                        aufwandByTyp,
+                        result,
+                        todoMap,
                         aktuellerMonat,
                         projektTyp);
-
-                if (restriktionenEingehalten) {
-                    // Übernahme der Gleichverteilung ins Ergebnis
-
-
-                } else {
-                    // neu Verteilung entsprechend der Restriktionen
-
-                    Optional<BigDecimal> kapazitaetDieserMonat =
-                            portfolioEingabeDaten.getKapazitaetMitBeschraenkung(team, aktuellerMonat, projektTyp);
-
-                    if (!kapazitaetDieserMonat.isPresent()) {
-                        return;
-                    }
-                    verteileNachRestriktion(portfolioEingabeDaten,
-                            team,
-                            aufwandByTyp,
-                            result,
-                            todoMap,
-                            aktuellerMonat,
-                            projektTyp);
-                }
 
             });
 
@@ -108,7 +103,89 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
         return result;
     }
 
-    private void verteileNachRestriktion(@Nonnull ProjektPortfolioEingabeDaten portfolioEingabeDaten,
+    private Map<ProjektTyp, BigDecimal> getVerteilungen(@Nonnull ProjektPortfolioEingabeDaten portfolioEingabeDaten,
+                                                        @Nonnull Set<ProjektTyp> invalid,
+                                                        @Nonnull Team team,
+                                                        @Nonnull LocalDate aktuellerMonat,
+                                                        @Nonnull Map<ProjektTyp, List<ProjektAufwand>> aufwandByTyp) {
+        HashMap<ProjektTyp, BigDecimal> result = Maps.newHashMap();
+
+        Optional<BigDecimal> kapazitaet = portfolioEingabeDaten.getKapazitaet(team, aktuellerMonat);
+        if (!kapazitaet.isPresent()) {
+            return result;
+        }
+
+        boolean keineMussProjekteVorhanden = aufwandByTyp.get(MUSS_PROJEKT).isEmpty();
+        boolean keineProduktProjekteVorhanden = aufwandByTyp.get(PRODUKT_PROJEKT).isEmpty();
+        boolean mussProjektVerletzt = invalid.contains(MUSS_PROJEKT);
+        boolean produktProjektVerletzt = invalid.contains(PRODUKT_PROJEKT);
+
+        if(keineMussProjekteVorhanden){
+            result.put(MUSS_PROJEKT, BigDecimal.ZERO);
+        }
+
+        if(keineProduktProjekteVorhanden){
+            result.put(PRODUKT_PROJEKT,BigDecimal.ZERO);
+        }
+
+        BigDecimal kapazitaetValue = kapazitaet.get();
+        if(produktProjektVerletzt && !mussProjektVerletzt){
+            // erst alles auf produkt und rest auf muss
+            // erst alles auf muss und den rest auf produkt
+            BigDecimal mussFaktor = portfolioEingabeDaten.getBeschraenkung(MUSS_PROJEKT).get();
+            BigDecimal produktFaktor = portfolioEingabeDaten.getBeschraenkung(PRODUKT_PROJEKT).get();
+
+            BigDecimal produktValue = kapazitaetValue.multiply(produktFaktor);
+            result.put(PRODUKT_PROJEKT,produktValue);
+
+            if(!keineMussProjekteVorhanden) {
+                BigDecimal mussMax = kapazitaetValue.multiply(kapazitaetValue.multiply(mussFaktor));
+                BigDecimal mussValue = kapazitaetValue
+                        .subtract(produktValue)
+                        .min(mussMax);
+
+                result.put(MUSS_PROJEKT, mussValue);
+            }
+
+
+        }
+
+        if(!produktProjektVerletzt && mussProjektVerletzt){
+            // erst alles auf muss und den rest auf produkt
+            BigDecimal mussFaktor = portfolioEingabeDaten.getBeschraenkung(MUSS_PROJEKT).get();
+            BigDecimal produktFaktor = portfolioEingabeDaten.getBeschraenkung(PRODUKT_PROJEKT).get();
+
+            BigDecimal mussValue = kapazitaetValue.multiply(mussFaktor);
+            result.put(MUSS_PROJEKT,mussValue);
+
+            if(!keineProduktProjekteVorhanden) {
+                BigDecimal produktMax = kapazitaetValue.multiply(kapazitaetValue.multiply(produktFaktor));
+                BigDecimal produktValue = kapazitaetValue
+                        .subtract(mussValue)
+                        .min(produktMax);
+
+                result.put(PRODUKT_PROJEKT, produktValue);
+            }
+        }
+
+        if(produktProjektVerletzt && mussProjektVerletzt){
+            // beides nach restriktionen
+            BigDecimal mussFaktor = portfolioEingabeDaten.getBeschraenkung(MUSS_PROJEKT).get();
+            BigDecimal produktFaktor = portfolioEingabeDaten.getBeschraenkung(PRODUKT_PROJEKT).get();
+
+            BigDecimal summeFaktoren = mussFaktor.add(produktFaktor);
+            BigDecimal mussValue = kapazitaetValue.multiply(mussFaktor).divide(summeFaktoren, MathContext.DECIMAL32);
+
+            BigDecimal produktValue = kapazitaetValue.multiply(produktFaktor).divide(summeFaktoren, MathContext.DECIMAL32);
+
+            result.put(MUSS_PROJEKT, mussValue);
+            result.put(PRODUKT_PROJEKT,produktValue);
+        }
+
+        return result;
+    }
+
+    private void verteileNachRestriktion(@Nonnull BigDecimal monatsMax,
                                          @Nonnull Team team,
                                          @Nonnull Map<ProjektTyp, List<ProjektAufwand>> aufwandByTyp,
                                          @Nonnull ProjektPortfolioVorschlag result,
@@ -116,12 +193,12 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
                                          @Nonnull LocalDate aktuellerMonat,
                                          @Nonnull ProjektTyp projektTyp) {
 
+
         List<ProjektAufwand> aufwandList = aufwandByTyp.get(projektTyp);
 
-
-        BigDecimal gesamt = kapazitaetDieserMonat.get();
-
         BigDecimal anzahl = new BigDecimal(aufwandList.size());
+
+        BigDecimal gesamt = BigDecimal.valueOf(monatsMax.doubleValue());
         for (ProjektAufwand projektAufwand : aufwandList) {
 
             Projekt projekt = projektAufwand.getProjekt();
@@ -158,7 +235,7 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
                             @Nonnull LocalDate aktuellerMonat) {
 
         gleichVerteilung.entrySet().forEach(projektUndAufwand -> {
-            result.add(team,projektUndAufwand.getKey(),aktuellerMonat,projektUndAufwand.getValue());
+            result.add(team, projektUndAufwand.getKey(), aktuellerMonat, projektUndAufwand.getValue());
         });
 
 
@@ -169,7 +246,7 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
                           @Nonnull Team team,
                           @Nonnull LocalDate aktuellerMonat,
                           @Nonnull ProjektTyp typ) {
-        Optional<BigDecimal> beschraenkung = eingabeDaten.getKapazitaetMitBeschraenkung(team, aktuellerMonat, typ);
+        Optional<BigDecimal> beschraenkung = eingabeDaten.getKapazitaet(team, aktuellerMonat, typ);
         if (!beschraenkung.isPresent()) {
             return true;
         }
@@ -181,9 +258,16 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
 
     private BigDecimal getSumme(@Nonnull HashMap<Projekt, BigDecimal> gleichVerteilung,
                                 @Nonnull ProjektTyp typ) {
-        return gleichVerteilung.entrySet()
+        List<Map.Entry<Projekt, BigDecimal>> projekte = gleichVerteilung.entrySet()
                 .stream()
                 .filter(entry -> entry.getKey().getTyp() == typ)
+                .collect(Collectors.toList());
+        if(projekte.isEmpty()){
+            return BigDecimal.ZERO;
+        }
+
+        return projekte
+                .stream()
                 .map(entry -> entry.getValue())
                 .reduce(BigDecimal::add)
                 .get();
@@ -195,9 +279,13 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
                                                           @Nonnull LocalDate aktuellerMonat,
                                                           @Nonnull List<Projekt> projekteFuerDiesenMonat) {
 
+        if(projekteFuerDiesenMonat.isEmpty()){
+            return Maps.newHashMap();
+        }
+
         BigDecimal anzahlProjekte = new BigDecimal(projekteFuerDiesenMonat.size());
 
-        Optional<BigDecimal> kapazitaet = portfolioEingabeDaten.getKapazitaetMitBeschraenkung(team, aktuellerMonat);
+        Optional<BigDecimal> kapazitaet = portfolioEingabeDaten.getKapazitaet(team, aktuellerMonat);
 
         if (!kapazitaet.isPresent()) {
             // es steht diesen Monat keine Kapazität zur Verfügung
