@@ -79,16 +79,11 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
             Map<ProjektTyp, BigDecimal> verteilungsMap = getVerteilungen(portfolioEingabeDaten,
                     invalid, team, aktuellerMonat, aufwandByTyp);
 
-            PFLICHT_PROJEKTE.forEach(projektTyp -> {
+            for (ProjektTyp projektTyp : PFLICHT_PROJEKTE) {
 
-                // neu Verteilung entsprechend der Restriktionen
-                Optional<BigDecimal> kapazitaetDieserMonat =
-                        portfolioEingabeDaten.getKapazitaet(team, aktuellerMonat, projektTyp);
+                BigDecimal monatsBudget = verteilungsMap.get(projektTyp);
 
-                if (!kapazitaetDieserMonat.isPresent()) {
-                    return;
-                }
-                verteileNachRestriktion(verteilungsMap.get(projektTyp),
+                verteileNachRestriktion(monatsBudget,
                         team,
                         aufwandByTyp,
                         result,
@@ -96,7 +91,7 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
                         aktuellerMonat,
                         projektTyp);
 
-            });
+            };
 
         }
 
@@ -196,10 +191,12 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
 
         List<ProjektAufwand> aufwandList = aufwandByTyp.get(projektTyp);
 
-        BigDecimal anzahl = new BigDecimal(aufwandList.size());
-
+        int gesamtAnzahl = aufwandList.size();
         BigDecimal gesamt = BigDecimal.valueOf(monatsMax.doubleValue());
-        for (ProjektAufwand projektAufwand : aufwandList) {
+
+        for (int i = 0; i < gesamtAnzahl; i++) {
+            ProjektAufwand projektAufwand = aufwandList.get(i);
+            BigDecimal anzahl = new BigDecimal(gesamtAnzahl-i);
 
             Projekt projekt = projektAufwand.getProjekt();
             BigDecimal proProjekt = gesamt.divide(anzahl, MathContext.DECIMAL32);
@@ -283,8 +280,6 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
             return Maps.newHashMap();
         }
 
-        BigDecimal anzahlProjekte = new BigDecimal(projekteFuerDiesenMonat.size());
-
         Optional<BigDecimal> kapazitaet = portfolioEingabeDaten.getKapazitaet(team, aktuellerMonat);
 
         if (!kapazitaet.isPresent()) {
@@ -292,14 +287,23 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
             return Maps.newHashMap();
         }
 
-        BigDecimal max = kapazitaet.get().divide(anzahlProjekte, BigDecimal.ROUND_HALF_UP);
-
+        int gesamtAnzahl = projekteFuerDiesenMonat.size();
         HashMap<Projekt, BigDecimal> gleichVerteilungsRunde = Maps.newHashMap();
-        for (Projekt projekt : projekteFuerDiesenMonat) {
+        BigDecimal gesamt = kapazitaet.get();
+
+        for (int i = 0; i < projekteFuerDiesenMonat.size(); i++) {
+            Projekt projekt = projekteFuerDiesenMonat.get(i);
+
+            BigDecimal anzahlProjekte = new BigDecimal(gesamtAnzahl - i);
+
+            BigDecimal max = gesamt.divide(anzahlProjekte, BigDecimal.ROUND_HALF_UP);
+
             BigDecimal todo = todoMap.get(projekt);
             BigDecimal monatsAufwand = todo.min(max);
 
             gleichVerteilungsRunde.put(projekt, monatsAufwand);
+
+            gesamt = gesamt.subtract(monatsAufwand);
         }
 
         return gleichVerteilungsRunde;
