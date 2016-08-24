@@ -55,7 +55,9 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
             LocalDate aktuellerMonat = deadLine.minusMonths(i);
 
             if(portfolioEingabeDaten.isAusserhalbZeitraum(aktuellerMonat)){
-                // TODO: 24.08.2016 overflow handling
+                // overflow handling
+                todoMap.forEach((projekt, todoValue) -> result.addUeberlauf(team,projekt,todoValue));
+
                 break;
             }
 
