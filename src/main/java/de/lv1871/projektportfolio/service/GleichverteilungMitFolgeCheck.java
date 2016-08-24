@@ -1,9 +1,6 @@
 package de.lv1871.projektportfolio.service;
 
-import com.google.common.collect.ImmutableSet;
-import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
-import com.google.common.collect.Ordering;
+import com.google.common.collect.*;
 import de.lv1871.projektportfolio.domain.*;
 
 import javax.annotation.Nonnull;
@@ -204,8 +201,13 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
         int gesamtAnzahl = aufwandList.size();
         BigDecimal gesamt = BigDecimal.valueOf(monatsMax.doubleValue());
 
+        List<ProjektAufwand> projekteSortiertNachRestAufwand = aufwandList
+                .stream()
+                .sorted(newOrderingByTodoMap(todoMap))
+                .collect(Collectors.toList());
+
         for (int i = 0; i < gesamtAnzahl; i++) {
-            ProjektAufwand projektAufwand = aufwandList.get(i);
+            ProjektAufwand projektAufwand = projekteSortiertNachRestAufwand.get(i);
             BigDecimal anzahl = new BigDecimal(gesamtAnzahl-i);
 
             Projekt projekt = projektAufwand.getProjekt();
@@ -221,6 +223,17 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
 
             result.add(team, projekt, aktuellerMonat, monatsWert);
         }
+    }
+
+    private Comparator<ProjektAufwand> newOrderingByTodoMap(@Nonnull Map<Projekt, BigDecimal> todoMap) {
+        return (o1, o2) -> {
+            return ComparisonChain
+                    .start()
+                    .compare(todoMap.get(o1.getProjekt()),
+                            todoMap.get(o2.getProjekt()),
+                            Ordering.natural())
+                    .result();
+        };
     }
 
     private void updateTodoMap(@Nonnull Map<Projekt, BigDecimal> todoMap,
@@ -301,8 +314,13 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
         HashMap<Projekt, BigDecimal> gleichVerteilungsRunde = Maps.newHashMap();
         BigDecimal gesamt = kapazitaet.get();
 
+        List<ProjektAufwand> projekteSortiertNachRestAufwand = projekteFuerDiesenMonat
+                .stream()
+                .sorted(newOrderingByTodoMap(todoMap))
+                .collect(Collectors.toList());
+
         for (int i = 0; i < projekteFuerDiesenMonat.size(); i++) {
-            Projekt projekt = projekteFuerDiesenMonat.get(i).getProjekt();
+            Projekt projekt = projekteSortiertNachRestAufwand.get(i).getProjekt();
 
             BigDecimal anzahlProjekte = new BigDecimal(gesamtAnzahl - i);
 
@@ -313,6 +331,7 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
 
             gleichVerteilungsRunde.put(projekt, monatsAufwand);
 
+            // gesamtaufwand reduzieren
             gesamt = gesamt.subtract(monatsAufwand);
         }
 
