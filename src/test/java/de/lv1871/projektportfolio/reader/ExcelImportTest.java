@@ -2,8 +2,8 @@ package de.lv1871.projektportfolio.reader;
 
 import de.lv1871.projektportfolio.domain.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
@@ -25,7 +25,7 @@ public class ExcelImportTest {
     private XSSFWorkbook workbook;
     private ProjektPortfolioEingabeDaten portfolio;
 
-    @BeforeAll
+    @BeforeEach
     public void setUp() throws Exception {
         Path resPath = Paths.get(getClass().getResource("/lv-projekte.xlsx").toURI());
 
@@ -33,7 +33,7 @@ public class ExcelImportTest {
         portfolio = reader.read(workbook);
     }
 
-    @AfterAll
+    @AfterEach
     public void tearDown() throws Exception {
         if (workbook != null) {
             workbook.close();

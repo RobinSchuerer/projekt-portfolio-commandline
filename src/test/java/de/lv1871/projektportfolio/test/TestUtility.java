@@ -91,6 +91,9 @@ public class TestUtility {
                 );
             }
         }
+
+        // TODO: 25.08.2016 overflow auslesen
+
         return vorschlag;
     }
 
@@ -137,6 +140,8 @@ public class TestUtility {
                     BigDecimal erwartungswert = aufwandOptional.get();
                     assertEquals(erwartungswert,aufwand, getMessage(team, projekt, monat));
                 });
+
+                // TODO: 25.08.2016 Overflow vergleich
             });
         });
     }

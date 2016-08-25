@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import de.lv1871.projektportfolio.domain.*;
 import de.lv1871.projektportfolio.reader.ProjektPortfolioExcelReader;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
@@ -28,7 +28,7 @@ public class ServiceTest {
     private Team team;
     private ProjektPortfolioEingabeDaten eingabeDaten;
 
-    @BeforeAll
+    @BeforeEach
     public void setUp() throws Exception {
         team = Team.newBuilder().withName("team1").build();
 
