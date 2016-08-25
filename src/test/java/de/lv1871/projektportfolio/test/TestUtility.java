@@ -103,12 +103,13 @@ public class TestUtility {
 
             Cell zelle = zeile.getCell(0);
             if (zelle == null
-                    || zelle.getCellType() != Cell.CELL_TYPE_STRING
-                    || zelle.getStringCellValue().equals("OUTPUT")) {
+                    || zelle.getCellType() != Cell.CELL_TYPE_STRING) {
                 continue;
             }
 
-            return Optional.of(zelle.getRowIndex());
+            if(zelle.getStringCellValue().equals("OUTPUT")) {
+                return Optional.of(zelle.getRowIndex());
+            }
         }
 
         return Optional.empty();
