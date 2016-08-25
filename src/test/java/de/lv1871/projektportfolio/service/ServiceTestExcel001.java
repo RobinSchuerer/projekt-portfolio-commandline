@@ -5,15 +5,14 @@ import de.lv1871.projektportfolio.domain.ProjektPortfolioVorschlag;
 import de.lv1871.projektportfolio.reader.ProjektPortfolioExcelReader;
 import de.lv1871.projektportfolio.test.TestUtility;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-public class ServiceTestLv {
-
+public class ServiceTestExcel001  {
     private ProjektPortfolioVorschlagService service = ProjektPortfolioVorschlagService
             .newBuilder()
             .withPflichtProjektStrategy(new GleichverteilungMitFolgeCheck())
@@ -23,10 +22,10 @@ public class ServiceTestLv {
     private ProjektPortfolioEingabeDaten eingabeDaten;
     private XSSFWorkbook workbook;
 
-    @BeforeAll
+    @BeforeEach
     public void setUp() throws Exception {
         ProjektPortfolioExcelReader reader = new ProjektPortfolioExcelReader();
-        String path = "/lv-projekte.xlsx";
+        String path = "/001 One-team-one-mhproject_v3.xlsx";
 
         Path resPath = Paths.get(getClass().getResource(path).toURI());
         workbook = new XSSFWorkbook(Files.newInputStream(resPath));

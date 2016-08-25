@@ -5,8 +5,8 @@ import com.google.common.collect.Lists;
 import de.lv1871.projektportfolio.domain.*;
 import de.lv1871.projektportfolio.reader.ProjektPortfolioExcelReader;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.Test;
 
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
@@ -15,7 +15,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class ServiceTest {
 
@@ -28,7 +28,7 @@ public class ServiceTest {
     private Team team;
     private ProjektPortfolioEingabeDaten eingabeDaten;
 
-    @Before
+    @BeforeAll
     public void setUp() throws Exception {
         team = Team.newBuilder().withName("team1").build();
 

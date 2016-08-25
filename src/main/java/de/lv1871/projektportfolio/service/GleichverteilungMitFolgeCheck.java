@@ -348,7 +348,12 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
     }
 
     private LocalDate getSpaetesteDeadline(List<ProjektAufwand> alleProjekte) {
-        return alleProjekte.stream().map(ProjektAufwand::getDeadLine).max(Ordering.natural()).get();
+        return alleProjekte
+                .stream()
+                .filter(projektAufwand -> projektAufwand.getDeadLine() != null)
+                .map(ProjektAufwand::getDeadLine)
+                .max(Ordering.natural())
+                .get();
     }
 
     @Nonnull

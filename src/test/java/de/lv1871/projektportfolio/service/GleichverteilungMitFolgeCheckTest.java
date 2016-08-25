@@ -5,7 +5,7 @@ import com.google.common.collect.Lists;
 import de.lv1871.projektportfolio.domain.*;
 import de.lv1871.projektportfolio.reader.ProjektPortfolioExcelReader;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
 import java.nio.file.Files;
@@ -13,7 +13,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class GleichverteilungMitFolgeCheckTest {
 
