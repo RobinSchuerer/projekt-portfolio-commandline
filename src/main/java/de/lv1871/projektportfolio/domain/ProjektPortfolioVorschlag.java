@@ -123,7 +123,6 @@ public class ProjektPortfolioVorschlag {
             return Optional.empty();
         }
 
-
         return Optional.of(reduce.get().setScale(2,BigDecimal.ROUND_HALF_UP));
     }
 

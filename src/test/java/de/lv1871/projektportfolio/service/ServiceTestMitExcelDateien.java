@@ -57,6 +57,51 @@ public class ServiceTestMitExcelDateien {
         testeExcelDatei("/006 Two-teams-one-mhproject-with-overflow.xlsx");
     }
 
+    @Test
+    public void test007() throws URISyntaxException, IOException {
+        testeExcelDatei("/007 One-team-one-strategic-project.xlsx");
+    }
+
+    @Test
+    public void test008() throws URISyntaxException, IOException {
+        testeExcelDatei("/008 One-team-one-mh-one-strategic-project.xlsx");
+    }
+
+    @Test
+    public void test009() throws URISyntaxException, IOException {
+        testeExcelDatei("/009 Two-teams-two-mh-one-strategic-project_b.xlsx");
+    }
+
+    @Test
+    public void test010() throws URISyntaxException, IOException {
+        testeExcelDatei("/010 One-team-two-sprojects.xlsx");
+    }
+
+    @Test
+    public void test013() throws URISyntaxException, IOException {
+        testeExcelDatei("/013 Many-teams-many-projects_team1extracted.xlsx");
+    }
+
+    @Test
+    public void test014() throws URISyntaxException, IOException {
+        testeExcelDatei("/014 Many-teams-many-projects_team3extracted_v2.xlsx");
+    }
+
+    @Test
+    public void test015_1T() throws URISyntaxException, IOException {
+        testeExcelDatei("/015_1T_Team3_1MHP_Project4.xlsx");
+    }
+
+    @Test
+    public void test015() throws URISyntaxException, IOException {
+        testeExcelDatei("/015 One-team-two-mh-one-prod-two-strategic-projects-with-overflow_v2.xlsx");
+    }
+
+    @Test
+    public void test016() throws URISyntaxException, IOException {
+        testeExcelDatei("/016_1T_Team1_1MHP_Project3.xlsx");
+    }
+
     private void testeExcelDatei(String path) throws URISyntaxException, IOException {
         ProjektPortfolioExcelReader reader = new ProjektPortfolioExcelReader();
 

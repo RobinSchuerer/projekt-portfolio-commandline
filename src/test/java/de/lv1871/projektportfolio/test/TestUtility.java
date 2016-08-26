@@ -58,11 +58,12 @@ public class TestUtility {
             }
 
             XSSFCell datumsZelle = zeile.getCell(0);
-            if (datumsZelle == null) {
+            if (datumsZelle == null || datumsZelle.getDateCellValue() == null) {
                 break;
             }
 
             Date datum = datumsZelle.getDateCellValue();
+
             LocalDate monat = Instant.ofEpochMilli(datum.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
 
             for (int j = 1; j < Integer.MAX_VALUE; j++) {

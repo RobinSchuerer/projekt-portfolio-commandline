@@ -13,9 +13,12 @@ public class ProjektPortfolioVorschlagService {
 
     private StrategischeProjekteStrategy strategischeProjekteStrategy;
 
+    private EingabeDatenValidator validator ;
+
     private ProjektPortfolioVorschlagService(Builder builder) {
         pflichtProjektStrategy = builder.pflichtProjektStrategy;
         strategischeProjekteStrategy = builder.strategischeProjekteStrategy;
+        validator = builder.validator;
     }
 
     public static Builder newBuilder() {
@@ -26,6 +29,12 @@ public class ProjektPortfolioVorschlagService {
     public ProjektPortfolioVorschlag berechne(@Nonnull ProjektPortfolioEingabeDaten eingabeDaten) {
 
         Preconditions.checkNotNull(eingabeDaten);
+
+        ValidationErrors validationErrors = validator.validate(eingabeDaten);
+
+        if(!validationErrors.getFehlerList().isEmpty()){
+            throw new RuntimeException(validationErrors.getFehlerList().stream().reduce(String::concat).get());
+        }
 
         ProjektPortfolioVorschlag vorschlag = ProjektPortfolioVorschlag.newBuilder().build();
 
@@ -45,8 +54,10 @@ public class ProjektPortfolioVorschlagService {
 
 
     public static final class Builder {
+
         private PflichtProjektStrategy pflichtProjektStrategy;
         private StrategischeProjekteStrategy strategischeProjekteStrategy;
+        private EingabeDatenValidator validator = new EingabeDatenValidator();
 
         private Builder() {
         }
@@ -54,6 +65,12 @@ public class ProjektPortfolioVorschlagService {
         @Nonnull
         public Builder withPflichtProjektStrategy(@Nonnull PflichtProjektStrategy val) {
             pflichtProjektStrategy = val;
+            return this;
+        }
+
+        @Nonnull
+        public Builder withValidator(@Nonnull EingabeDatenValidator val) {
+            validator = val;
             return this;
         }
 
