@@ -88,18 +88,8 @@ public class ServiceTestMitExcelDateien {
     }
 
     @Test
-    public void test015_1T() throws URISyntaxException, IOException {
-        testeExcelDatei("/015_1T_Team3_1MHP_Project4.xlsx");
-    }
-
-    @Test
     public void test015() throws URISyntaxException, IOException {
         testeExcelDatei("/015 One-team-two-mh-one-prod-two-strategic-projects-with-overflow_v2.xlsx");
-    }
-
-    @Test
-    public void test016() throws URISyntaxException, IOException {
-        testeExcelDatei("/016_1T_Team1_1MHP_Project3.xlsx");
     }
 
     private void testeExcelDatei(String path) throws URISyntaxException, IOException {
