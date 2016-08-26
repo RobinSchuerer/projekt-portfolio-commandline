@@ -74,14 +74,21 @@ public class TestUtility {
                 double value = zelle.getNumericCellValue();
                 BigDecimal aufwand = new BigDecimal(value);
 
+                int spaltenIndex = zelle.getColumnIndex();
                 String team = sheet
                         .getRow(indexTeamZeile)
-                        .getCell(zelle.getColumnIndex())
+                        .getCell(spaltenIndex)
                         .getStringCellValue();
-                String projekt = sheet
+                XSSFCell teamCell = sheet
                         .getRow(indexProjektZeile)
-                        .getCell(zelle.getColumnIndex())
-                        .getStringCellValue();
+                        .getCell(spaltenIndex);
+
+                Preconditions.checkNotNull(teamCell,
+                        "Konnte keine Zelle für Team finden: " + indexProjektZeile + "," + spaltenIndex);
+                Preconditions.checkArgument(teamCell.getCellType() == Cell.CELL_TYPE_STRING,
+                        "Konnte keine Zelle für Team finden: " + indexProjektZeile + "," + spaltenIndex);
+
+                String projekt = teamCell.getStringCellValue();
 
                 vorschlag.add(
                         Team.newBuilder().withName(team).build(),
@@ -92,13 +99,50 @@ public class TestUtility {
             }
         }
 
-        // TODO: 25.08.2016 overflow auslesen
+        Optional<Integer> ueberlauf = getZeilenIndexOverflow(sheet);
+        if (!ueberlauf.isPresent()) {
+            throw new RuntimeException("kein 'Overflow' in der ersten Spalte gefunden!");
+        }
+
+        Integer indexOverflowZeile = ueberlauf.get();
+        XSSFRow overflowTeamZeile = sheet.getRow(indexOverflowZeile);
+        if (overflowTeamZeile == null) {
+            throw new RuntimeException("Kein Overflow gefunden");
+        }
+
+        XSSFRow overflowValuesZeile = sheet.getRow(indexOverflowZeile + 1);
+        for (int i = 1; i < Integer.MAX_VALUE; i++) {
+            XSSFCell teamCell = overflowTeamZeile.getCell(i);
+            if (teamCell == null) {
+                break;
+            }
+            String teamName = teamCell.getStringCellValue();
+
+
+            XSSFCell valueCell = overflowValuesZeile.getCell(i);
+            if (valueCell == null) {
+                throw new RuntimeException("Overflow: Kein Wert für " + teamName);
+            }
+
+            vorschlag.addUeberlauf(teamName, new BigDecimal(valueCell.getNumericCellValue()));
+
+        }
 
         return vorschlag;
     }
 
     @Nonnull
     private static Optional<Integer> getZeilenIndexOutput(@Nonnull XSSFSheet sheet) {
+        return getZeilenIndex(sheet, "OUTPUT");
+    }
+
+    @Nonnull
+    private static Optional<Integer> getZeilenIndexOverflow(@Nonnull XSSFSheet sheet) {
+        return getZeilenIndex(sheet, "Overflow");
+    }
+
+    @Nonnull
+    private static Optional<Integer> getZeilenIndex(@Nonnull XSSFSheet sheet, @Nonnull String suchbegriff) {
         Iterator<Row> rowIterator = sheet.rowIterator();
 
         while (rowIterator.hasNext()) {
@@ -110,7 +154,7 @@ public class TestUtility {
                 continue;
             }
 
-            if(zelle.getStringCellValue().equals("OUTPUT")) {
+            if (zelle.getStringCellValue().equals(suchbegriff)) {
                 return Optional.of(zelle.getRowIndex());
             }
         }
@@ -135,16 +179,18 @@ public class TestUtility {
                     BigDecimal aufwand = aufwandProMonat.getAufwand();
 
                     Optional<BigDecimal> aufwandOptional = erwartung.getAufwand(team.getName(), projekt.getName(), monat);
-                    assertTrue(aufwandOptional.isPresent(),getMessage(team,projekt,monat));
+                    assertTrue(aufwandOptional.isPresent(), getMessage(team, projekt, monat));
 
                     BigDecimal erwartungswert = aufwandOptional.get();
-                    assertEquals(erwartungswert,aufwand, getMessage(team, projekt, monat));
+                    assertEquals(erwartungswert, aufwand, getMessage(team, projekt, monat));
                 });
 
-                // TODO: 25.08.2016 Overflow vergleich
-            });
+                vorschlag.getTeams().forEach(s -> {
+                    assertEquals(erwartung.getUeberlauf(s), vorschlag.getUeberlauf(s), "Overflow: " + s);
+                });
         });
-    }
+    });
+}
 
     private static String getMessage(Team team, Projekt projekt, LocalDate monat) {
         return "Team: " + team.getName() + " Projekt: " + projekt.getName() + " Monat: " + monat.format(DateTimeFormatter.ofPattern("MMM YY"));

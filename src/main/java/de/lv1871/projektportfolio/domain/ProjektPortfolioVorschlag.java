@@ -9,7 +9,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class ProjektPortfolioVorschlag {
 
@@ -31,9 +33,9 @@ public class ProjektPortfolioVorschlag {
 
     @Nonnull
     public ProjektPortfolioVorschlag add(@Nonnull Team team,
-                    @Nonnull Projekt projekt,
-                    @Nonnull LocalDate aktuellerMonat,
-                    @Nonnull BigDecimal monatsWert) {
+                                         @Nonnull Projekt projekt,
+                                         @Nonnull LocalDate aktuellerMonat,
+                                         @Nonnull BigDecimal monatsWert) {
 
         AufwandProMonat aufwandProMonat = AufwandProMonat
                 .newBuilder()
@@ -47,9 +49,9 @@ public class ProjektPortfolioVorschlag {
                 .filter(newProjektFilter(projekt))
                 .findAny();
 
-        if (proTeamUndProjektOptional.isPresent()){
+        if (proTeamUndProjektOptional.isPresent()) {
             proTeamUndProjektOptional.get().getAufwaende().add(aufwandProMonat);
-        }else {
+        } else {
             aufwandVerteilungen.add(
                     AufwandverteilungProTeamUndProjekt
                             .newBuilder()
@@ -91,30 +93,69 @@ public class ProjektPortfolioVorschlag {
     }
 
     @Nonnull
-    public Optional<BigDecimal> getUeberlauf(@Nonnull String teamName, @Nonnull  String projektName) {
+    public Optional<BigDecimal> getUeberlauf(@Nonnull String teamName, @Nonnull String projektName) {
 
         List<BigDecimal> values = ueberlauf.getValues(
                 Team.newBuilder().withName(teamName).build(),
                 Projekt.newBuilder().withName(projektName).build());
 
-        if(values.isEmpty()){
+        if (values.isEmpty()) {
             return Optional.empty();
         }
 
-        return Optional.of(values.get(0));
+        return normalize(Optional.of(values.get(0)));
     }
 
+    @Nonnull
+    public Optional<BigDecimal> getUeberlauf(@Nonnull String teamName) {
+        Optional<BigDecimal> reduce = ueberlauf.getValues(Team.newBuilder().withName(teamName).build())
+                .stream()
+                .reduce(BigDecimal::add);
+        return normalize(reduce);
+    }
+
+    private Optional<BigDecimal> normalize(Optional<BigDecimal> reduce) {
+        if(!reduce.isPresent()){
+            return Optional.empty();
+        }
+
+        if (reduce.isPresent() && reduce.get().doubleValue() == 0d) {
+            return Optional.empty();
+        }
+
+
+        return Optional.of(reduce.get().setScale(2,BigDecimal.ROUND_HALF_UP));
+    }
+
+    @Nonnull
+    public Set<String> getTeams() {
+        return this.aufwandVerteilungen
+                .stream()
+                .map(AufwandverteilungProTeamUndProjekt::getTeam)
+                .map(Team::getName)
+                .collect(Collectors.toSet());
+    }
+
+    @Nonnull
     public ProjektPortfolioVorschlag addUeberlauf(Team team, Projekt projekt, BigDecimal value) {
-        this.ueberlauf.put(value.setScale(2),team,projekt);
+        this.ueberlauf.put(value.setScale(2), team, projekt);
 
         return this;
     }
 
+    @Nonnull
     public ProjektPortfolioVorschlag addTeamVorschlag(@Nonnull ProjektPortfolioVorschlag teamProjektVorschlag) {
         Preconditions.checkNotNull(teamProjektVorschlag);
 
         aufwandVerteilungen.addAll(teamProjektVorschlag.getAufwandVerteilungen());
         ueberlauf.merge(teamProjektVorschlag.ueberlauf);
+
+        return this;
+    }
+
+    @Nonnull
+    public ProjektPortfolioVorschlag addUeberlauf(@Nonnull String teamName, @Nonnull BigDecimal overflow) {
+        this.ueberlauf.put(overflow, Team.newBuilder().withName(teamName).build());
 
         return this;
     }
