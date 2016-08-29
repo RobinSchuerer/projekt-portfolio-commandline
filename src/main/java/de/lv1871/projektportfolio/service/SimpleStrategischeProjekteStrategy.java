@@ -8,7 +8,10 @@ import de.lv1871.projektportfolio.domain.ProjektPortfolioVorschlag;
 import de.lv1871.projektportfolio.domain.Team;
 
 import javax.annotation.Nonnull;
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
@@ -25,9 +28,50 @@ public class SimpleStrategischeProjekteStrategy implements StrategischeProjekteS
         List<ProjektAufwand> projekte = getProjekteSortiertNachPrioritaet(eingabeDaten);
 
         // Start monat
+        LocalDate startMonat = eingabeDaten.getStartMonat();
 
+        for (ProjektAufwand projektAufwand : projekte) {
+            BigDecimal rest = projektAufwand.getAufwand(team);
 
-        return null;
+            for(int i = 0; i <Integer.MAX_VALUE; i++){
+                
+                // aktueller monat
+                LocalDate monat = startMonat.plusMonths(i);
+                if(eingabeDaten.isAusserhalbZeitraum(monat)){
+                    break;
+                }
+
+                BigDecimal kapazitaet = getKapazitaet(eingabeDaten,team,pflichtProjekteVorschlag,monat);
+                
+                BigDecimal aufwand = rest.min(kapazitaet);
+                
+                pflichtProjekteVorschlag.add(team,projektAufwand.getProjekt(),monat,aufwand);
+
+                rest = rest.subtract(aufwand);
+            }
+
+            if(rest.doubleValue() > 0){
+                // TODO: 29.08.2016 da ist noch was zu tun 
+            }
+        }
+
+        return pflichtProjekteVorschlag;
+    }
+
+    private BigDecimal getKapazitaet(@Nonnull ProjektPortfolioEingabeDaten eingabeDaten,
+                                     @Nonnull Team team,
+                                     @Nonnull ProjektPortfolioVorschlag vorschlag,
+                                     @Nonnull LocalDate monat) {
+
+        Optional<BigDecimal> kapazitaet = eingabeDaten.getKapazitaet(team, monat);
+        if(!kapazitaet.isPresent()){
+            return BigDecimal.ZERO;
+        }
+
+        BigDecimal verbraucht = vorschlag.getAufwand(team,monat).orElse(BigDecimal.ZERO);
+        
+        return kapazitaet.get().subtract(verbraucht).max(BigDecimal.ZERO);
+
     }
 
     private List<ProjektAufwand> getProjekteSortiertNachPrioritaet(@Nonnull ProjektPortfolioEingabeDaten eingabeDaten) {

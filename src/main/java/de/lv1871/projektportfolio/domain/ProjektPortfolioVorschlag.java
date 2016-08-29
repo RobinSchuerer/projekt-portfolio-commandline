@@ -93,6 +93,26 @@ public class ProjektPortfolioVorschlag {
     }
 
     @Nonnull
+    public Optional<BigDecimal> getAufwand(@Nonnull Team team,
+                                           @Nonnull LocalDate monat) {
+
+        List<AufwandverteilungProTeamUndProjekt> matching = aufwandVerteilungen
+                .stream()
+                .filter(aufwand -> aufwand.getTeam().equals(team))
+                .collect(Collectors.toList());
+
+
+        return matching
+                .stream()
+                .map(proTeamUndProjekt -> proTeamUndProjekt.getAufwaende()
+                        .stream()
+                        .filter(proMonat->proMonat.getMonat().equals(monat))
+                        .map(proMonat->proMonat.getAufwand())
+                        .reduce(BigDecimal::add).orElse(BigDecimal.ZERO))
+                .reduce(BigDecimal::add);
+    }
+
+    @Nonnull
     public Optional<BigDecimal> getUeberlauf(@Nonnull String teamName, @Nonnull String projektName) {
 
         List<BigDecimal> values = ueberlauf.getValues(

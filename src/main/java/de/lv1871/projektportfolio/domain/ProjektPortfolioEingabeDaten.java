@@ -127,7 +127,14 @@ public class ProjektPortfolioEingabeDaten {
         return aktuellerMonat.isBefore(fruehsterMonat);
     }
 
+    public LocalDate getStartMonat() {
+        // TODO: 29.08.2016  Ermittlung des Startmonats
+
+        return null;
+    }
+
     public static final class Builder {
+        
         private String name;
         private List<Beschraenkung> beschraenkungen = Lists.newArrayList();
         private List<TeamKapazitaet> teamKapazitaeten = Lists.newArrayList();
