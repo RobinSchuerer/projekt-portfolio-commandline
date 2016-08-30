@@ -18,7 +18,7 @@ public class ServiceTestMitExcelDateien {
     private ProjektPortfolioVorschlagService service = ProjektPortfolioVorschlagService
             .newBuilder()
             .withPflichtProjektStrategy(new GleichverteilungMitFolgeCheck())
-            .withStrategischeProjekteStrategy((pflichtProjekteVorschlag, eingabeDaten1, team1) -> pflichtProjekteVorschlag)
+            .withStrategischeProjekteStrategy(new SimpleStrategischeProjekteStrategy())
             .build();
 
 

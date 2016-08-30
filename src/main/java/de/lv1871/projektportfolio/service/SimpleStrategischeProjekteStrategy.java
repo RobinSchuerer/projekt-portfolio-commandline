@@ -48,10 +48,16 @@ public class SimpleStrategischeProjekteStrategy implements StrategischeProjekteS
                 pflichtProjekteVorschlag.add(team,projektAufwand.getProjekt(),monat,aufwand);
 
                 rest = rest.subtract(aufwand);
+
+                if(rest.doubleValue() == 0){
+                    pflichtProjekteVorschlag.addDeadLine(team, projektAufwand.getProjekt(), monat);
+
+                    break;
+                }
             }
 
             if(rest.doubleValue() > 0){
-                // TODO: 29.08.2016 da ist noch was zu tun 
+                pflichtProjekteVorschlag.addUeberlauf(team,projektAufwand.getProjekt(),rest);
             }
         }
 

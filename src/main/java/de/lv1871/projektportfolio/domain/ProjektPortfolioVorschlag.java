@@ -2,6 +2,7 @@ package de.lv1871.projektportfolio.domain;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Ordering;
 import de.ros.tagmap.TagMap;
 
 import javax.annotation.Nonnull;
@@ -18,6 +19,8 @@ public class ProjektPortfolioVorschlag {
     private final List<AufwandverteilungProTeamUndProjekt> aufwandVerteilungen;
 
     private final TagMap<BigDecimal> ueberlauf = new TagMap<>();
+
+    private final TagMap<LocalDate> deadlines = new TagMap<>();
 
     private ProjektPortfolioVorschlag(Builder builder) {
         aufwandVerteilungen = builder.aufwandVerteilungen;
@@ -156,6 +159,15 @@ public class ProjektPortfolioVorschlag {
     }
 
     @Nonnull
+    public Set<String> getProjekte(){
+        return this.aufwandVerteilungen
+                .stream()
+                .map(AufwandverteilungProTeamUndProjekt::getProjekt)
+                .map(Projekt::getName)
+                .collect(Collectors.toSet());
+    }
+
+    @Nonnull
     public ProjektPortfolioVorschlag addUeberlauf(Team team, Projekt projekt, BigDecimal value) {
         this.ueberlauf.put(value.setScale(2), team, projekt);
 
@@ -177,6 +189,22 @@ public class ProjektPortfolioVorschlag {
         this.ueberlauf.put(overflow, Team.newBuilder().withName(teamName).build());
 
         return this;
+    }
+
+    @Nonnull
+    public ProjektPortfolioVorschlag addDeadLine(@Nonnull Team team,
+                                                 @Nonnull Projekt projekt,
+                                                 @Nonnull LocalDate monat) {
+        this.deadlines.put(monat,team,projekt);
+
+        return this;
+    }
+
+    @Nonnull
+    public Optional<LocalDate> getDealine(@Nonnull String projektName){
+        List<LocalDate> values = deadlines.getValues(Projekt.newBuilder().withName(projektName).build());
+
+        return values.stream().max(Ordering.natural());
     }
 
     public static final class Builder {

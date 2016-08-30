@@ -118,23 +118,30 @@ public class ProjektPortfolioEingabeDaten {
     public boolean isAusserhalbZeitraum(@Nonnull LocalDate aktuellerMonat) {
         Preconditions.checkNotNull(aktuellerMonat);
 
-        LocalDate fruehsterMonat = getTeamKapazitaeten()
+        LocalDate fruehsterMonat = getStartMonat();
+        LocalDate endMonat = getEndMonat();
+
+        return aktuellerMonat.isBefore(fruehsterMonat) || aktuellerMonat.isAfter(endMonat);
+    }
+
+    private LocalDate getEndMonat() {
+        return getTeamKapazitaeten()
                 .stream()
                 .map(teamKapazitaet -> teamKapazitaet.getMonat())
                 .min(Ordering.natural())
                 .get();
-
-        return aktuellerMonat.isBefore(fruehsterMonat);
     }
 
     public LocalDate getStartMonat() {
-        // TODO: 29.08.2016  Ermittlung des Startmonats
-
-        return null;
+        return getTeamKapazitaeten()
+                .stream()
+                .map(teamKapazitaet -> teamKapazitaet.getMonat())
+                .min(Ordering.natural())
+                .get();
     }
 
     public static final class Builder {
-        
+
         private String name;
         private List<Beschraenkung> beschraenkungen = Lists.newArrayList();
         private List<TeamKapazitaet> teamKapazitaeten = Lists.newArrayList();

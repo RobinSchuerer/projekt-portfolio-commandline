@@ -189,9 +189,16 @@ public class TestUtility {
                 vorschlag.getTeams().forEach(s -> {
                     assertEquals(erwartung.getUeberlauf(s), vorschlag.getUeberlauf(s), "Overflow: " + s);
                 });
+
+                vorschlag.getProjekte().forEach(projektName -> {
+                            assertEquals(erwartung.getUeberlauf(projektName),
+                                    vorschlag.getUeberlauf(projektName),
+                                    "Deadline: " + projektName);
+                        }
+                );
+            });
         });
-    });
-}
+    }
 
     private static String getMessage(Team team, Projekt projekt, LocalDate monat) {
         return "Team: " + team.getName() + " Projekt: " + projekt.getName() + " Monat: " + monat.format(DateTimeFormatter.ofPattern("MMM YY"));
