@@ -34,6 +34,71 @@ public class TestUtility {
 
         XSSFSheet sheet = workbook.getSheetAt(0);
 
+        ProjektPortfolioVorschlag vorschlag = readMonatsWerte(sheet);
+        readUeberlauf(sheet, vorschlag);
+        readDeadLine(sheet,vorschlag);
+
+        return vorschlag;
+    }
+
+    private static void readDeadLine(@Nonnull XSSFSheet sheet, @Nonnull ProjektPortfolioVorschlag vorschlag) {
+        Optional<Integer> zeilenIndex = getZeilenIndexDeadline(sheet);
+        if(!zeilenIndex.isPresent()){
+            throw new RuntimeException("Keine Deadline gefunden");
+        }
+
+        Integer indexDeadlineZeile = zeilenIndex.get();
+        XSSFRow deadlineZeile = sheet.getRow(indexDeadlineZeile);
+
+        int indexProjekt = indexDeadlineZeile - 1;
+        XSSFRow projektZeile = sheet.getRow(indexProjekt);
+        for (int i = 2; i < Integer.MAX_VALUE; i++){
+            XSSFCell projektZelle = projektZeile.getCell(i);
+            if(projektZelle == null){
+                break;
+            }
+
+            String projektName = projektZelle.getStringCellValue();
+
+            XSSFCell deadlineZelle = deadlineZeile.getCell(i);
+
+            Date datum = deadlineZelle.getDateCellValue();
+
+            vorschlag.addDeadLine(projektName,from(datum));
+        }
+    }
+
+    @Nonnull
+    private static Optional<Integer> getZeilenIndexDeadline(@Nonnull XSSFSheet sheet) {
+
+        Optional<Integer> zeilenIndexOutput = getZeilenIndex(sheet, "OUTPUT");
+        if(!zeilenIndexOutput.isPresent()){
+            throw new RuntimeException("Keine Deadline gefunden");
+        }
+
+        for(int i = zeilenIndexOutput.get(); i < 250; i++){
+            XSSFRow zeile = sheet.getRow(i);
+            if(zeile == null){
+                continue;
+            }
+
+            XSSFCell ersteZelle = zeile.getCell(0);
+            if(ersteZelle == null || ersteZelle.getCellType() != Cell.CELL_TYPE_STRING){
+                continue;
+            }
+
+            if(ersteZelle.getStringCellValue().equals("deadline (last month)")){
+                return Optional.of(zeile.getRowNum());
+            }
+
+            continue;
+
+        }
+
+        return Optional.empty();
+    }
+
+    private static ProjektPortfolioVorschlag readMonatsWerte(XSSFSheet sheet) {
         // suche nach String "Output"
         Optional<Integer> indexOutput = getZeilenIndexOutput(sheet);
         if (!indexOutput.isPresent()) {
@@ -64,7 +129,7 @@ public class TestUtility {
 
             Date datum = datumsZelle.getDateCellValue();
 
-            LocalDate monat = Instant.ofEpochMilli(datum.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+            LocalDate monat = from(datum);
 
             for (int j = 1; j < Integer.MAX_VALUE; j++) {
                 XSSFCell zelle = zeile.getCell(j);
@@ -99,7 +164,14 @@ public class TestUtility {
                 );
             }
         }
+        return vorschlag;
+    }
 
+    private static LocalDate from(Date datum) {
+        return Instant.ofEpochMilli(datum.getTime()).atZone(ZoneId.systemDefault()).toLocalDate();
+    }
+
+    private static void readUeberlauf(XSSFSheet sheet, ProjektPortfolioVorschlag vorschlag) {
         Optional<Integer> ueberlauf = getZeilenIndexOverflow(sheet);
         if (!ueberlauf.isPresent()) {
             throw new RuntimeException("kein 'Overflow' in der ersten Spalte gefunden!");
@@ -128,8 +200,6 @@ public class TestUtility {
             vorschlag.addUeberlauf(teamName, new BigDecimal(valueCell.getNumericCellValue()));
 
         }
-
-        return vorschlag;
     }
 
     @Nonnull
@@ -191,8 +261,9 @@ public class TestUtility {
                 });
 
                 vorschlag.getProjekte().forEach(projektName -> {
-                            assertEquals(erwartung.getUeberlauf(projektName),
-                                    vorschlag.getUeberlauf(projektName),
+                            assertEquals(
+                                    erwartung.getDealine(projektName),
+                                    vorschlag.getDealine(projektName),
                                     "Deadline: " + projektName);
                         }
                 );

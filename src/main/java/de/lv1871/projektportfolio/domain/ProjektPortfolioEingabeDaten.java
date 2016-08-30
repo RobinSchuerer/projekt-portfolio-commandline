@@ -128,7 +128,7 @@ public class ProjektPortfolioEingabeDaten {
         return getTeamKapazitaeten()
                 .stream()
                 .map(teamKapazitaet -> teamKapazitaet.getMonat())
-                .min(Ordering.natural())
+                .max(Ordering.natural())
                 .get();
     }
 

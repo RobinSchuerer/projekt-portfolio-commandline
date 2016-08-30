@@ -98,6 +98,9 @@ public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
 
         }
 
+        // deadlines für pflicht projekte
+        result.updateDeadlinesFuerPflichtProjekte();
+
         return result;
     }
 

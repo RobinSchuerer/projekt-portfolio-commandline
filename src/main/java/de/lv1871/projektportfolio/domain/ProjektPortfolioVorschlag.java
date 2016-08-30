@@ -109,8 +109,8 @@ public class ProjektPortfolioVorschlag {
                 .stream()
                 .map(proTeamUndProjekt -> proTeamUndProjekt.getAufwaende()
                         .stream()
-                        .filter(proMonat->proMonat.getMonat().equals(monat))
-                        .map(proMonat->proMonat.getAufwand())
+                        .filter(proMonat -> proMonat.getMonat().equals(monat))
+                        .map(proMonat -> proMonat.getAufwand())
                         .reduce(BigDecimal::add).orElse(BigDecimal.ZERO))
                 .reduce(BigDecimal::add);
     }
@@ -138,7 +138,7 @@ public class ProjektPortfolioVorschlag {
     }
 
     private Optional<BigDecimal> normalize(Optional<BigDecimal> reduce) {
-        if(!reduce.isPresent()){
+        if (!reduce.isPresent()) {
             return Optional.empty();
         }
 
@@ -146,7 +146,7 @@ public class ProjektPortfolioVorschlag {
             return Optional.empty();
         }
 
-        return Optional.of(reduce.get().setScale(2,BigDecimal.ROUND_HALF_UP));
+        return Optional.of(reduce.get().setScale(2, BigDecimal.ROUND_HALF_UP));
     }
 
     @Nonnull
@@ -159,7 +159,7 @@ public class ProjektPortfolioVorschlag {
     }
 
     @Nonnull
-    public Set<String> getProjekte(){
+    public Set<String> getProjekte() {
         return this.aufwandVerteilungen
                 .stream()
                 .map(AufwandverteilungProTeamUndProjekt::getProjekt)
@@ -180,6 +180,7 @@ public class ProjektPortfolioVorschlag {
 
         aufwandVerteilungen.addAll(teamProjektVorschlag.getAufwandVerteilungen());
         ueberlauf.merge(teamProjektVorschlag.ueberlauf);
+        deadlines.merge(teamProjektVorschlag.deadlines);
 
         return this;
     }
@@ -195,16 +196,31 @@ public class ProjektPortfolioVorschlag {
     public ProjektPortfolioVorschlag addDeadLine(@Nonnull Team team,
                                                  @Nonnull Projekt projekt,
                                                  @Nonnull LocalDate monat) {
-        this.deadlines.put(monat,team,projekt);
+        this.deadlines.put(monat, team, projekt);
 
         return this;
     }
 
     @Nonnull
-    public Optional<LocalDate> getDealine(@Nonnull String projektName){
+    public Optional<LocalDate> getDealine(@Nonnull String projektName) {
         List<LocalDate> values = deadlines.getValues(Projekt.newBuilder().withName(projektName).build());
 
         return values.stream().max(Ordering.natural());
+    }
+
+    @Nonnull
+    public ProjektPortfolioVorschlag addDeadLine(@Nonnull String projektName, @Nonnull LocalDate deadline) {
+        deadlines.put(deadline,Projekt.newBuilder().withName(projektName).build());
+        return this;
+    }
+
+    @Nonnull
+    public ProjektPortfolioVorschlag updateDeadlinesFuerPflichtProjekte() {
+      asfassdfasdfd
+
+
+
+
     }
 
     public static final class Builder {
