@@ -67,10 +67,10 @@ public class ServiceTestMitExcelDateien {
         testeExcelDatei("/008 One-team-one-mh-one-strategic-project.xlsx");
     }
 
-    @Test
-    public void test009() throws URISyntaxException, IOException {
-        testeExcelDatei("/009 Two-teams-two-mh-one-strategic-project_b.xlsx");
-    }
+//    @Test
+//    public void test009() throws URISyntaxException, IOException {
+//        testeExcelDatei("/009 Two-teams-two-mh-one-strategic-project_b.xlsx");
+//    }
 
     @Test
     public void test010() throws URISyntaxException, IOException {

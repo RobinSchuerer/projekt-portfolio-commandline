@@ -14,6 +14,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.LocalDate;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -129,7 +130,7 @@ public class ServiceTest {
         assertEquals(new BigDecimal("5.80"), getValue(vorschlag,"Team1", "Project2", "2016-05-01"));
         assertEquals(new BigDecimal("8.00"), getValue(vorschlag,"Team1", "Project2", "2016-04-01"));
 
-        assertEquals(new BigDecimal("0.00"), vorschlag.getUeberlauf("Team1","Project1").get());
+        assertEquals(Optional.empty(), vorschlag.getUeberlauf("Team1","Project1"));
         assertEquals(new BigDecimal("9.40"), vorschlag.getUeberlauf("Team1","Project2").get());
 
     }
