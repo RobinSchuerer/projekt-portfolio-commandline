@@ -203,7 +203,7 @@ public class ProjektPortfolioVorschlag {
     }
 
     @Nonnull
-    public Optional<LocalDate> getDealine(@Nonnull String projektName) {
+    public Optional<LocalDate> getDeadline(@Nonnull String projektName) {
         List<LocalDate> values = deadlines.getValues(Projekt.newBuilder().withName(projektName).build());
 
         return values.stream().max(Ordering.natural());

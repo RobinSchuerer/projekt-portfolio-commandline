@@ -262,8 +262,8 @@ public class TestUtility {
 
                 vorschlag.getProjekte().forEach(projektName -> {
                             assertEquals(
-                                    erwartung.getDealine(projektName),
-                                    vorschlag.getDealine(projektName),
+                                    erwartung.getDeadline(projektName),
+                                    vorschlag.getDeadline(projektName),
                                     "Deadline: " + projektName);
                         }
                 );

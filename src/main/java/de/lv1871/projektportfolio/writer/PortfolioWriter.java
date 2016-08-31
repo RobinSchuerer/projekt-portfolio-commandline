@@ -21,10 +21,10 @@ public class PortfolioWriter {
 
 
     public void write(XSSFWorkbook workbook, ProjektPortfolioVorschlag vorschlag) {
-        XSSFSheet zweitesSheet = workbook.createSheet("Output");
+        XSSFSheet output = workbook.createSheet("Output");
 
         // monat header
-        XSSFRow monatsZeile = zweitesSheet.createRow(0);
+        XSSFRow monatsZeile = output.createRow(0);
         monatsZeile.createCell(1).setCellValue("Monat");
 
         List<LocalDate> monate = Lists.newArrayList(vorschlag.getMonate());
@@ -41,7 +41,6 @@ public class PortfolioWriter {
         }
 
         int zeilenIndex = 1;
-        // TODO: 31.08.16 projekte ausgeben
 
 
         Set<String> teams = vorschlag.getTeams();
@@ -54,7 +53,7 @@ public class PortfolioWriter {
                     continue;
                 }
 
-                XSSFRow zeile = zweitesSheet.createRow(zeilenIndex);
+                XSSFRow zeile = output.createRow(zeilenIndex);
                 zeile.createCell(0).setCellValue(team);
                 zeile.createCell(1).setCellValue(projekt);
 
@@ -73,8 +72,8 @@ public class PortfolioWriter {
         zeilenIndex++;
 
         // overflow
-        XSSFRow overflowTeam = zweitesSheet.createRow(zeilenIndex++);
-        XSSFRow overflowValue = zweitesSheet.createRow(zeilenIndex++);
+        XSSFRow overflowTeam = output.createRow(zeilenIndex++);
+        XSSFRow overflowValue = output.createRow(zeilenIndex++);
         overflowTeam.createCell(0).setCellValue("Overflow");
 
         int spalte = 1;
@@ -84,10 +83,29 @@ public class PortfolioWriter {
             spalte++;
         }
 
-        // TODO: 31.08.16 deadline
-//        projects		Project1
-//        deadline (last month)		Sep 16
+        
+        // deadline
 
+        XSSFRow deadlinesProjekte = output.createRow(zeilenIndex++);
+        XSSFRow deadlinesMonate = output.createRow(zeilenIndex++);
+
+        deadlinesProjekte.createCell(0).setCellValue("Projekte");
+        deadlinesMonate.createCell(0).setCellValue("deadline (last month)");
+
+        int deadlineSpalte = 1;
+        for (String projekt : vorschlag.getProjekte()) {
+            Optional<LocalDate> deadline = vorschlag.getDeadline(projekt);
+            if(!deadline.isPresent()){
+                continue;
+            }
+
+            deadlinesProjekte.createCell(deadlineSpalte).setCellValue(projekt);
+            XSSFCell deadlineMonatCell = deadlinesMonate.createCell(deadlineSpalte);
+            deadlineMonatCell.setCellStyle(dateStyle);
+            deadlineMonatCell.setCellValue(from(deadline.get()));
+
+            deadlineSpalte++;
+        }
 
     }
 
