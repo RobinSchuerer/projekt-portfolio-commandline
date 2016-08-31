@@ -6,6 +6,7 @@ import de.lv1871.projektportfolio.domain.ProjektAufwand;
 import de.lv1871.projektportfolio.domain.ProjektPortfolioEingabeDaten;
 import de.lv1871.projektportfolio.domain.ProjektPortfolioVorschlag;
 import de.lv1871.projektportfolio.domain.Team;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
@@ -17,6 +18,7 @@ import java.util.stream.Collectors;
 /**
  * Alle strategischen projekte werden nach Priorität abgearbeitet
  */
+@Service
 public class SimpleStrategischeProjekteStrategy implements StrategischeProjekteStrategy {
 
     @Nonnull

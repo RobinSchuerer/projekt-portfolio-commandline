@@ -2,9 +2,11 @@ package de.lv1871.projektportfolio.service;
 
 import de.lv1871.projektportfolio.domain.ProjektAufwand;
 import de.lv1871.projektportfolio.domain.ProjektPortfolioEingabeDaten;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 
+@Service
 public class EingabeDatenValidator {
 
 

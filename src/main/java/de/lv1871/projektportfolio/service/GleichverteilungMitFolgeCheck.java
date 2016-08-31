@@ -2,6 +2,7 @@ package de.lv1871.projektportfolio.service;
 
 import com.google.common.collect.*;
 import de.lv1871.projektportfolio.domain.*;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
@@ -17,6 +18,7 @@ import static de.lv1871.projektportfolio.domain.ProjektTyp.PRODUKT_PROJEKT;
  * In der ersten Iteration wird alles gleich verteilt. Danach folgt ein Check ob die Restriktionen eingehalten sind.
  * Wenn dieser Check nicht eingehalten wird. So werden die Aufwände entsprechend der #
  */
+@Service
 public class GleichverteilungMitFolgeCheck implements PflichtProjektStrategy {
 
     private final static Set<ProjektTyp> PFLICHT_PROJEKTE = ImmutableSet.of(MUSS_PROJEKT, PRODUKT_PROJEKT);

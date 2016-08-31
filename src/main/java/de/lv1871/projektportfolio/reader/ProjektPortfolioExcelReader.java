@@ -8,6 +8,7 @@ import org.apache.poi.xssf.usermodel.XSSFCell;
 import org.apache.poi.xssf.usermodel.XSSFRow;
 import org.apache.poi.xssf.usermodel.XSSFSheet;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -19,6 +20,7 @@ import java.util.stream.Collectors;
 
 import static org.apache.poi.ss.usermodel.Cell.*;
 
+@Service
 public class ProjektPortfolioExcelReader {
 
     public ProjektPortfolioEingabeDaten read(XSSFWorkbook workbook) {

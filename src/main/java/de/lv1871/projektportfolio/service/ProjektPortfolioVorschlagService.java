@@ -4,16 +4,26 @@ import com.google.common.base.Preconditions;
 import de.lv1871.projektportfolio.domain.ProjektPortfolioEingabeDaten;
 import de.lv1871.projektportfolio.domain.ProjektPortfolioVorschlag;
 import de.lv1871.projektportfolio.domain.Team;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 
+@Service
 public class ProjektPortfolioVorschlagService {
 
+    @Autowired
     private PflichtProjektStrategy pflichtProjektStrategy;
 
+    @Autowired
     private StrategischeProjekteStrategy strategischeProjekteStrategy;
 
+    @Autowired
     private EingabeDatenValidator validator ;
+
+    public ProjektPortfolioVorschlagService(){
+
+    }
 
     private ProjektPortfolioVorschlagService(Builder builder) {
         pflichtProjektStrategy = builder.pflichtProjektStrategy;
