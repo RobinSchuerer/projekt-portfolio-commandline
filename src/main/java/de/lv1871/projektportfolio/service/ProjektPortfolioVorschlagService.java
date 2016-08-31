@@ -4,10 +4,12 @@ import com.google.common.base.Preconditions;
 import de.lv1871.projektportfolio.domain.ProjektPortfolioEingabeDaten;
 import de.lv1871.projektportfolio.domain.ProjektPortfolioVorschlag;
 import de.lv1871.projektportfolio.domain.Team;
+import de.lv1871.projektportfolio.domain.TeamKapazitaet;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
+import java.time.LocalDate;
 
 @Service
 public class ProjektPortfolioVorschlagService {
@@ -57,6 +59,13 @@ public class ProjektPortfolioVorschlagService {
                     strategischeProjekteStrategy.verarbeite(pflichtProjekteVorschlag,eingabeDaten,team);
 
             vorschlag.addTeamVorschlag(teamProjektVorschlag);
+        }
+
+        // TODO: 31.08.16
+        for (TeamKapazitaet teamKapazitaet : eingabeDaten.getTeamKapazitaeten()) {
+            LocalDate monat = teamKapazitaet.getMonat();
+
+            vorschlag.add(monat);
         }
 
         return vorschlag;

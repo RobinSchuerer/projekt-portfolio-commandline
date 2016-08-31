@@ -2,15 +2,14 @@ package de.lv1871.projektportfolio.domain;
 
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
 import de.ros.tagmap.TagMap;
 
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -21,6 +20,8 @@ public class ProjektPortfolioVorschlag {
     private final TagMap<BigDecimal> ueberlauf = new TagMap<>();
 
     private final TagMap<LocalDate> deadlines = new TagMap<>();
+
+    private final TreeSet<LocalDate> monate = new TreeSet<>();
 
     private ProjektPortfolioVorschlag(Builder builder) {
         aufwandVerteilungen = builder.aufwandVerteilungen;
@@ -239,6 +240,35 @@ public class ProjektPortfolioVorschlag {
         }
 
         return this;
+    }
+
+    @Nonnull
+    public ProjektPortfolioVorschlag add(@Nonnull LocalDate monat) {
+        monate.add(monat);
+
+        return this;
+    }
+
+    public TreeSet<LocalDate> getMonate() {
+        return monate;
+    }
+
+    @Nonnull
+    public Map<LocalDate,BigDecimal> getMonatsAufwaende(@Nonnull String team, @Nonnull String projekt) {
+        Optional<AufwandverteilungProTeamUndProjekt> first = aufwandVerteilungen
+                .stream()
+                .filter(a -> a.getTeam().getName().equals(team) && a.getProjekt().getName().equals(projekt))
+                .findFirst();
+
+        if(!first.isPresent()){
+            return Maps.newHashMap();
+        }
+
+        return first.get().getAufwaende()
+                .stream()
+                .collect(Collectors.toMap(AufwandProMonat::getMonat,AufwandProMonat::getAufwand));
+
+
     }
 
     public static final class Builder {
