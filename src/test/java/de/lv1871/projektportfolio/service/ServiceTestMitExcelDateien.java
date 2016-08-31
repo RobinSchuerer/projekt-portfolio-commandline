@@ -95,7 +95,6 @@ public class ServiceTestMitExcelDateien {
     private void testeExcelDatei(String path) throws URISyntaxException, IOException {
         ProjektPortfolioExcelReader reader = new ProjektPortfolioExcelReader();
 
-
         Path resPath = Paths.get(getClass().getResource(path).toURI());
         XSSFWorkbook workbook = new XSSFWorkbook(Files.newInputStream(resPath));
         ProjektPortfolioEingabeDaten eingabeDaten = reader.read(workbook);

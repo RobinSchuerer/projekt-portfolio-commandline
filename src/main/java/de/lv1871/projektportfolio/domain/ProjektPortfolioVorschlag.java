@@ -216,11 +216,29 @@ public class ProjektPortfolioVorschlag {
 
     @Nonnull
     public ProjektPortfolioVorschlag updateDeadlinesFuerPflichtProjekte() {
-      asfassdfasdfd
 
+        //  ermittle die späteste deadline über alle projekte und über alle teams hinweg
+        for (AufwandverteilungProTeamUndProjekt aufwandverteilungProTeamUndProjekt : aufwandVerteilungen) {
+            Projekt projekt = aufwandverteilungProTeamUndProjekt.getProjekt();
 
+            for (AufwandProMonat aufwandProMonat : aufwandverteilungProTeamUndProjekt.getAufwaende()) {
+                LocalDate monat = aufwandProMonat.getMonat();
 
+                List<LocalDate> alteWerte = this.deadlines.getValues(projekt, monat);
+                if(alteWerte.isEmpty()){
+                    deadlines.put(monat,projekt);
+                    continue;
+                }
 
+                LocalDate alterWert = alteWerte.get(0);
+
+                if(monat.isAfter(alterWert)){
+                    deadlines.put(monat,projekt);
+                }
+            }
+        }
+
+        return this;
     }
 
     public static final class Builder {
