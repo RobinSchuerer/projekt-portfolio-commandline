@@ -11,9 +11,9 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.ComponentScan;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -44,7 +44,7 @@ public class ProjektPortfolioApplication {
             ProjektPortfolioVorschlag vorschlag = service.berechne(eingabeDaten);
             writer.write(workbook,vorschlag);
 
-            FileOutputStream stream = new FileOutputStream("test.xlsx");
+            OutputStream stream = Files.newOutputStream(resPath);
             workbook.write(stream);
             stream.close();
 

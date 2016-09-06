@@ -61,7 +61,6 @@ public class ProjektPortfolioVorschlagService {
             vorschlag.addTeamVorschlag(teamProjektVorschlag);
         }
 
-        // TODO: 31.08.16
         for (TeamKapazitaet teamKapazitaet : eingabeDaten.getTeamKapazitaeten()) {
             LocalDate monat = teamKapazitaet.getMonat();
 
