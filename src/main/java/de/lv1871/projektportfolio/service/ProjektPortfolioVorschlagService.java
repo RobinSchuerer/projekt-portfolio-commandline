@@ -21,11 +21,7 @@ public class ProjektPortfolioVorschlagService {
     private StrategischeProjekteStrategy strategischeProjekteStrategy;
 
     @Autowired
-    private EingabeDatenValidator validator ;
-
-    public ProjektPortfolioVorschlagService(){
-
-    }
+    private EingabeDatenValidator validator;
 
     private ProjektPortfolioVorschlagService(Builder builder) {
         pflichtProjektStrategy = builder.pflichtProjektStrategy;
@@ -37,26 +33,30 @@ public class ProjektPortfolioVorschlagService {
         return new Builder();
     }
 
+    public ProjektPortfolioVorschlagService() {
+    }
+
     @Nonnull
     public ProjektPortfolioVorschlag berechne(@Nonnull ProjektPortfolioEingabeDaten eingabeDaten) {
 
         Preconditions.checkNotNull(eingabeDaten);
 
+        ProjektPortfolioVorschlag vorschlag = ProjektPortfolioVorschlag.newBuilder().build();
         ValidationErrors validationErrors = validator.validate(eingabeDaten);
+        vorschlag.addFehler(validationErrors);
 
-        if(!validationErrors.getFehlerList().isEmpty()){
-            throw new RuntimeException(validationErrors.getFehlerList().stream().reduce(String::concat).get());
+        if (!validationErrors.getFehlerList().isEmpty()) {
+            return vorschlag;
         }
 
-        ProjektPortfolioVorschlag vorschlag = ProjektPortfolioVorschlag.newBuilder().build();
 
         // Teamweise Verarbeitung
         for (Team team : eingabeDaten.getTeams()) {
 
-            ProjektPortfolioVorschlag pflichtProjekteVorschlag = pflichtProjektStrategy.verarbeite(eingabeDaten,team);
+            ProjektPortfolioVorschlag pflichtProjekteVorschlag = pflichtProjektStrategy.verarbeite(eingabeDaten, team);
 
             ProjektPortfolioVorschlag teamProjektVorschlag =
-                    strategischeProjekteStrategy.verarbeite(pflichtProjekteVorschlag,eingabeDaten,team);
+                    strategischeProjekteStrategy.verarbeite(pflichtProjekteVorschlag, eingabeDaten, team);
 
             vorschlag.addTeamVorschlag(teamProjektVorschlag);
         }
@@ -66,6 +66,7 @@ public class ProjektPortfolioVorschlagService {
 
             vorschlag.add(monat);
         }
+
 
         return vorschlag;
     }

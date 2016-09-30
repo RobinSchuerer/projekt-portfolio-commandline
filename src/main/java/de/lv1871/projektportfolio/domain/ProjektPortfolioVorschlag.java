@@ -4,6 +4,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Ordering;
+import de.lv1871.projektportfolio.service.ValidationErrors;
 import de.ros.tagmap.TagMap;
 
 import javax.annotation.Nonnull;
@@ -22,6 +23,8 @@ public class ProjektPortfolioVorschlag {
     private final TagMap<LocalDate> deadlines = new TagMap<>();
 
     private final TreeSet<LocalDate> monate = new TreeSet<>();
+
+    private final List<String> protokollEintrage = Lists.newArrayList();
 
     private ProjektPortfolioVorschlag(Builder builder) {
         aufwandVerteilungen = builder.aufwandVerteilungen;
@@ -269,6 +272,14 @@ public class ProjektPortfolioVorschlag {
                 .collect(Collectors.toMap(AufwandProMonat::getMonat,AufwandProMonat::getAufwand));
 
 
+    }
+
+    public void addFehler(ValidationErrors validationErrors) {
+        this.protokollEintrage.addAll(validationErrors.getFehlerList());
+    }
+
+    public List<String> getProtokollEintrage() {
+        return protokollEintrage;
     }
 
     public static final class Builder {

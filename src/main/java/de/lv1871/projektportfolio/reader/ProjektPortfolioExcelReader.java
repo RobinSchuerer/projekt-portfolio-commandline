@@ -145,7 +145,7 @@ public class ProjektPortfolioExcelReader {
     }
 
     private LocalDate getDeadLine(XSSFCell deadlineCell) {
-        if (deadlineCell.getCellType() != CELL_TYPE_NUMERIC) {
+        if (deadlineCell == null || deadlineCell.getCellType() != CELL_TYPE_NUMERIC) {
             return null;
         }
 

@@ -10,17 +10,31 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.ZoneId;
 import java.util.*;
 
-/**
- * Created by robin on 31.08.16.
- */
 @Service
 public class PortfolioWriter {
 
 
     public void write(XSSFWorkbook workbook, ProjektPortfolioVorschlag vorschlag) {
+        writeOutput(workbook, vorschlag);
+        writeProtokoll(workbook,vorschlag);
+    }
+
+    private void writeProtokoll(XSSFWorkbook workbook, ProjektPortfolioVorschlag vorschlag) {
+        XSSFSheet sheet = workbook.createSheet("Protokoll");
+        int zeilenIndex = 1;
+
+        for (String eintrag : vorschlag.getProtokollEintrage()) {
+            sheet.createRow(zeilenIndex++).createCell(0).setCellValue(eintrag);
+        }
+
+        sheet.createRow(zeilenIndex++).createCell(0).setCellValue("Verarbeitungsende" + LocalTime.now().toString());
+    }
+
+    private void writeOutput(XSSFWorkbook workbook, ProjektPortfolioVorschlag vorschlag) {
         XSSFSheet output = workbook.createSheet("Output");
 
         // monat header
@@ -83,7 +97,7 @@ public class PortfolioWriter {
             spalte++;
         }
 
-        
+
         // deadline
 
         XSSFRow deadlinesProjekte = output.createRow(zeilenIndex++);
@@ -106,7 +120,6 @@ public class PortfolioWriter {
 
             deadlineSpalte++;
         }
-
     }
 
     @Nonnull
